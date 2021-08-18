@@ -1,16 +1,11 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+.login-card {
+  background-color: #2d2d2d;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.accent {
+  background-color: #8075FF;
 }
 
-* {
-  box-sizing: border-box;
+html {
+  background-color: #121212;
 }
