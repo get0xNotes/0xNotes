@@ -1,10 +1,21 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    if (localStorage.getItem("e_key") && localStorage.getItem("a_key") && localStorage.getItem("user")) {
+      setIsLoggedIn(true)
+    } else {
+      setIsLoggedIn(false)
+    }
+  }, [])
+
   return (
     <div className="">
       <Head>
@@ -18,12 +29,17 @@ export default function Home() {
           <img src></img>
           <span>0xNotes</span>
         </div>
-        <div className="ml-auto">
+        <div style={{display: isLoggedIn ? 'none' : 'block'}} className="ml-auto">
           <Link href="/login">
             <a className="mx-1">Login</a>
           </Link>
           <Link href="/signup">
             <button className="accent my-auto mx-1 px-2 py-1 rounded-md">Sign Up</button>
+          </Link>
+        </div>
+        <div style={{display: isLoggedIn ? 'block' : 'none'}} className="ml-auto">
+          <Link href="/dash">
+            <button className="accent my-auto mx-1 px-2 py-1 rounded-md">Dashboard</button>
           </Link>
         </div>
       </header>
