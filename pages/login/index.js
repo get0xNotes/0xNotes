@@ -92,7 +92,8 @@ export default function Login() {
                 </div>
                 <button disabled={isLoading ? true : false} className="accent mt-1 mx-1 p-2 rounded-md" onClick={(e) => login(username, password)}>{isLoading ? "Loading..." : "Login"}</button>
 
-                <span className="mx-auto mt-5">New user?&nbsp;
+                <span className="mx-auto mt-5">
+                    <span>New user? </span>
                     <Link href="/signup">
                         <a className="text-blue-500 hover:underline">Create an account</a>
                     </Link>.
