@@ -24,29 +24,36 @@ export default function Login() {
                 var keys = buffer2hex(bits)
                 var e_key = keys.substr(0, 64)
                 var a_key = keys.substr(64, 64)
-                localStorage.setItem("user", username)
-                localStorage.setItem("e_key", e_key)
-                localStorage.setItem("a_key", a_key)
+                localStorage.setItem("USERNAME", username)
+                localStorage.setItem("ENCRYPTION_KEY", e_key)
+                localStorage.setItem("AUTHENTICATION_KEY", a_key)
             })
         }
     }
 
-    function checkUserAuthentication() {
-        var a_key = localStorage.getItem("a_key")
-        var username = localStorage.getItem("user")
-        axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user?auth=" + a_key + "&username=" + username).then((response) => {
+    function getSessionToken() {
+        var a_key = localStorage.getItem("AUTHENTICATION_KEY")
+        var username = localStorage.getItem("USERNAME")
+        var longsession = document.getElementById("longsession").checked ? 1 : 0
+        axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user/session?auth=" + a_key + "&username=" + username + "&long_session=" + longsession).then((response) => {
             console.log(response.data)
-            if (response.data.authenticated) {
+            if (response.data.session) {
+                localStorage.removeItem("AUTHENTICATION_KEY")
+                localStorage.setItem("SESSION_TOKEN", response.data.jwt)
                 router.push("/dash")
             } else {
-                alert("Invalid username or password")
+                localStorage.removeItem("AUTHENTICATION_KEY")
+                localStorage.removeItem("ENCRYPTION_KEY")
+                alert("Error: Invalid credentials or user does not exist.")
             }
             setIsLoading(false)
         }).catch((error) => {
+            localStorage.removeItem("AUTHENTICATION_KEY")
+            localStorage.removeItem("ENCRYPTION_KEY")
             alert(error)
             setIsLoading(false)
         })
-        
+
     }
 
     function login(username, password) {
@@ -55,7 +62,7 @@ export default function Login() {
             setIsLoading(true)
             derive_and_set_key(username, password)
             setTimeout(() => {
-                checkUserAuthentication()
+                getSessionToken()
             }, 100)
         } else {
             alert("Username and password are required.")
@@ -64,13 +71,13 @@ export default function Login() {
     }
 
     useEffect(() => {
-        if (localStorage.getItem("user")) {
-            document.getElementById("username").value = localStorage.getItem("user")
-            setUsername(localStorage.getItem("user"))
+        if (localStorage.getItem("USERNAME")) {
+            document.getElementById("username").value = localStorage.getItem("USERNAME")
+            setUsername(localStorage.getItem("USERNAME"))
         }
 
-        if (localStorage.getItem("e_key") && localStorage.getItem("a_key") && localStorage.getItem("user")) {
-            checkUserAuthentication()
+        if (localStorage.getItem("SESSION_TOKEN")) {
+            router.push("/dash")
         }
     }, [])
 
@@ -89,6 +96,10 @@ export default function Login() {
                     <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="text" name="username" placeholder="Username"></input>
                     <label className="mx-1">Password</label>
                     <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="password" name="password" placeholder="Password"></input>
+                    <div className="mx-1 mt-1">
+                        <input id="longsession" value="1" type="checkbox"></input>
+                        <label for="longsession" className="ml-1">Keep me logged in for a week.</label>
+                    </div>
                 </div>
                 <button disabled={isLoading ? true : false} className="accent mt-1 mx-1 p-2 rounded-md" onClick={(e) => login(username, password)}>{isLoading ? "Loading..." : "Login"}</button>
 
