@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
-import os, psycopg, jwt, time
+import os, psycopg, jwt, time, string
 
 load_dotenv()
 
@@ -23,9 +23,54 @@ def decode_jwt(token):
     except jwt.InvalidTokenError:
         return False, ''
 
+def check_username_availability(username):
+    if len(username) < 5:
+        return False
+
+    with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+            if cur.fetchone():
+                return False
+            else:
+                return True
+
 @app.route('/')
 def root():
     return "<h1>0xNotes API Server</h1>"
+
+
+@app.route('/api/v1/user/signup', methods=['GET'])
+def sign_up():
+    username = request.args.get('username')
+    auth = request.args.get('auth')
+
+    if not username or not auth:
+        return(jsonify({'success': False, 'error': 'Missing username or auth'}))
+
+    if not check_username_availability(username):
+        return(jsonify({'success': False, 'error': 'Username already taken'}))
+
+    if all(c in set(string.hexdigits) for c in auth) == False or len(auth) != 64:
+        return(jsonify({'success': False, 'error': 'Invalid authentication key. Key must be a hexadecimal string with a length of 256 bytes.'}))
+
+    with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO users (username, auth) VALUES (%s, %s)", (username, auth))
+
+    return(jsonify({'success': not check_username_availability(username)}))
+    
+
+
+@app.route('/api/v1/user/available', methods=['GET'])
+def check_username_availability_flask():
+    username = request.args.get('username')
+
+    if username:
+        return jsonify({"success": True, "available": check_username_availability(username)})
+    else:
+        # If username is empty return not available
+        return jsonify({"success": False, "available": False})
 
 @app.route('/api/v1/user/session', methods=['GET'])
 def get_session():
