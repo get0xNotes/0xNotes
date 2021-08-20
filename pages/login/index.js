@@ -36,7 +36,6 @@ export default function Login() {
         var username = localStorage.getItem("USERNAME")
         var longsession = document.getElementById("longsession").checked ? 1 : 0
         axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user/session?auth=" + a_key + "&username=" + username + "&long_session=" + longsession).then((response) => {
-            console.log(response.data)
             if (response.data.session) {
                 localStorage.removeItem("AUTHENTICATION_KEY")
                 localStorage.setItem("SESSION_TOKEN", response.data.jwt)
