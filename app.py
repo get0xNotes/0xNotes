@@ -1,12 +1,18 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
-import os, psycopg, jwt, time, string
+import os, psycopg, jwt, time, string, base64
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Hash import SHA512
+from Crypto.Random import get_random_bytes
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
+SERVER_ENCRYPTION_KEY = PBKDF2(os.getenv('SERVER_SECRET'), os.getenv('SERVER_SALT'), 32, 100000, hmac_hash_module=SHA512)
 
 def encode_jwt(username, long_session=False):
     expires_in = 86400 # 24 hours
@@ -14,14 +20,12 @@ def encode_jwt(username, long_session=False):
         expires_in = 604800 # 1 week
     return jwt.encode({'aud': username, 'exp': time.time() + expires_in}, os.environ.get("SERVER_SECRET"), algorithm='HS256')
 
-def decode_jwt(token):
+def decode_jwt(token, username):
     try:
-        payload = jwt.decode(token, os.environ.get("SERVER_SECRET"))
-        return True, payload['aud']
-    except jwt.ExpiredSignatureError:
-        return False, ''
-    except jwt.InvalidTokenError:
-        return False, ''
+        jwt.decode(token, os.environ.get("SERVER_SECRET"), audience=username, algorithms=['HS256'])
+        return True
+    except Exception as e:
+        return False
 
 def check_username_availability(username):
     if len(username) < 5:
@@ -92,6 +96,64 @@ def get_session():
                 return jsonify({'session': True, 'jwt': encode_jwt(username, long_session)})
             else:
                 return jsonify({'session': False})
+
+@app.route('/api/v1/notes/create', methods=['POST'])
+def create_notes():
+    try:
+        auth = request.headers.get('Authorization')
+        session = auth.split("Bearer ")[1]
+        username = request.form.get('username')
+        notes_type = request.form.get('type')
+        title = base64.b64decode(request.form.get('title'))
+        title_nonce = request.form.get('title_nonce')
+        notes = base64.b64decode(request.form.get('notes'))
+        notes_nonce = request.form.get('notes_nonce')
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Invalid request'})
+
+    if not session or not username or not title or not title_nonce or not notes or not notes_nonce:
+        return jsonify({'success': False, 'error': 'Missing required fields'})
+
+    if not decode_jwt(session, username):
+        return jsonify({'success': False, 'error': 'Invalid session'})
+
+    server_nonce = get_random_bytes(8)
+    c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
+    c2 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
+    title_encrypted = base64.b64encode(c1.encrypt(title)).decode('utf-8')
+    notes_encrypted = base64.b64encode(c2.encrypt(notes)).decode('utf-8')
+
+    try:
+        with psycopg.connect(os.environ.get('POSTGRES_URL')) as conn:
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO notes (author, type, server_nonce, title_nonce, notes_nonce, title, note) VALUES (%s, %s, %s, %s, %s, %s, %s)", (username, notes_type, server_nonce.hex(), title_nonce, notes_nonce, title_encrypted, notes_encrypted))
+                return jsonify({'success': True})
+    except:
+        return jsonify({'success': False, 'error': 'Database error'})
+
+@app.route('/api/v1/notes/list', methods=['GET'])
+def list_notes():
+    auth = request.headers.get('Authorization')
+    username = request.args.get('username')
+    if not auth or not username:
+        return(jsonify({'success': False, 'error': 'Missing session token or username'}))
+    else:
+        session = auth.split("Bearer ")[1]
+        authorized = decode_jwt(session, username)
+        if authorized:
+            try:
+                with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+                    with conn.cursor() as cur:
+                        cur.execute("SELECT id, type, server_nonce, title_nonce, title FROM notes WHERE author=%s", (username,))
+                        notes = cur.fetchall()
+                        notes_decrypted = []
+                        for note in notes:
+                            c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
+                            notes_decrypted.append({"id": note[0], "type": note[1], "title": base64.b64encode(c1.decrypt(base64.b64decode(note[4]))).decode(), "title_nonce": note[3]})
+                        return(jsonify({'success': True, 'notes': notes_decrypted}))
+            except:
+                return(jsonify({'success': False, 'error': 'Database error'}))
+    
 
 if __name__ == '__main__':
     app.run()
