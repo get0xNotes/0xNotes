@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -24,10 +23,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <header className="flex p-4 w-screen text-white bg-gray-700">
-        <div className="my-auto">
-          <img src></img>
-          <span>0xNotes</span>
+      <header className="flex p-4 w-full text-white bg-gray-700">
+        <div className="my-auto flex">
+          <img src="/logo/2rev.png" className="h-8 my-auto mx-1"></img>
+          <span className="my-auto text-2xl mx-1">0xNotes</span>
         </div>
         <div style={{ display: isLoggedIn ? 'none' : 'block' }} className="ml-auto">
           <Link href="/login">
@@ -45,7 +44,7 @@ export default function Home() {
       </header>
 
       <main className="">
-        <a className="text-white">
+        <p className="text-white">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed risus pretium quam vulputate dignissim suspendisse in est. Ut eu sem integer vitae justo eget magna fermentum iaculis. Mauris vitae ultricies leo integer malesuada nunc vel risus. Integer vitae justo eget magna fermentum. Nulla porttitor massa id neque aliquam. Viverra suspendisse potenti nullam ac tortor. Commodo ullamcorper a lacus vestibulum sed arcu non. Molestie nunc non blandit massa enim nec dui nunc. Volutpat est velit egestas dui id ornare arcu odio ut. Lobortis elementum nibh tellus molestie nunc non blandit. Velit sed ullamcorper morbi tincidunt ornare massa eget. Non sodales neque sodales ut etiam sit amet nisl purus. Consectetur lorem donec massa sapien faucibus et molestie ac.
           <br></br>
           <br></br>
@@ -74,36 +73,35 @@ export default function Home() {
           <br></br>
           <br></br>
           Commodo viverra maecenas accumsan lacus vel. Ultricies mi eget mauris pharetra. Tincidunt ornare massa eget egestas purus viverra accumsan in. Ac placerat vestibulum lectus mauris ultrices eros in cursus turpis. Ultrices tincidunt arcu non sodales neque sodales ut etiam sit. Eget dolor morbi non arcu. Vitae proin sagittis nisl rhoncus mattis rhoncus. Lacinia at quis risus sed vulputate odio. Velit laoreet id donec ultrices tincidunt. Felis bibendum ut tristique et egestas quis ipsum suspendisse ultrices. Velit aliquet sagittis id consectetur purus ut faucibus pulvinar. Velit scelerisque in dictum non consectetur a erat nam.
-        </a>
+        </p>
 
       </main>
-      {/* &copy; Copyright 2021 0xNotes &#183; GitHub &#183; Terms &#183; Privacy */}
-      {/* className="p-4 w-screen text-white bg-gray-700" */}
 
       <footer className="bg-gray-700 relative pt-1">
         <div className="container mx-auto px-6">
           <div className="sm:flex">
             <div className="mt-8 sm:mb-8 sm:w-full sm:px-8 flex flex-col md:flex-row justify-between">
               <div className="flex flex-col">
-                <Image src="/tupay.png" alt="0xNotes logo" layout="fixed" width={100} height={100} />
+                <img src="/logo/1rev.png" alt="0xNotes logo" className="h-40" />
                 <br></br>
                 
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-white mt-4 md:mt-0 mb-2">About Us</span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">About</a></span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">Terms</a></span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">Privacy</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">About</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">Terms</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">Privacy</a></span>
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-white mt-4 md:mt-0 mb-2">Resources</span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">FAQ</a></span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">GitHub</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">FAQ</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">GitHub</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">Server Status</a></span>
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-white mt-4 md:mt-0 mb-2">Contact Us</span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">Contact</a></span>
-                <span className="my-2"><a href="#" class="text-white  text-md hover:text-blue-500">Report Bug</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">Contact</a></span>
+                <span className="my-2"><a href="#" className="text-white  text-md hover:text-blue-500">Report Bug</a></span>
               </div>
             </div>
           </div>
