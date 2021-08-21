@@ -3,4 +3,5 @@ pycryptodome
 git+https://github.com/psycopg/psycopg.git#subdirectory=psycopg
 python-dotenv
 flask
+gunicorn
 pyjwt
