@@ -26,7 +26,7 @@ export default function Home() {
 
       <header className="flex p-4 w-full text-white bg-gray-700">
         <div className="my-auto flex">
-          <Image src="/logo/2rev.png" className="h-8 my-auto mx-1"/>
+          <Image src="/logo/2rev.png" alt="0xNotes header logo" width={30} height={30} className="h-8 my-auto mx-1"/>
           <span className="my-auto text-2xl mx-1">0xNotes</span>
         </div>
         <div style={{ display: isLoggedIn ? 'none' : 'block' }} className="ml-auto">
@@ -83,7 +83,7 @@ export default function Home() {
           <div className="sm:flex">
             <div className="mt-8 sm:mb-8 sm:w-full sm:px-8 flex flex-col md:flex-row justify-between">
               <div className="flex flex-col">
-                <Image src="/logo/1rev.png" alt="0xNotes logo" className="h-40" />
+                <Image src="/logo/1rev.png" alt="0xNotes footer logo" className="h-40" width={100} height={100}/>
                 <br></br>
                 
               </div>
