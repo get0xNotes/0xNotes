@@ -26,7 +26,7 @@ export default function Home() {
 
       <header className="flex p-4 w-full text-white bg-gray-700">
         <div className="my-auto flex">
-          <Image src="/logo/2rev.png" className="h-8 my-auto mx-1"></img>
+          <Image src="/logo/2rev.png" className="h-8 my-auto mx-1"/>
           <span className="my-auto text-2xl mx-1">0xNotes</span>
         </div>
         <div style={{ display: isLoggedIn ? 'none' : 'block' }} className="ml-auto">
