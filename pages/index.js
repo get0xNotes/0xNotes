@@ -2,6 +2,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 
 export default function Home() {
@@ -25,7 +26,7 @@ export default function Home() {
 
       <header className="flex p-4 w-full text-white bg-gray-700">
         <div className="my-auto flex">
-          <img src="/logo/2rev.png" className="h-8 my-auto mx-1"></img>
+          <Image src="/logo/2rev.png" className="h-8 my-auto mx-1"></img>
           <span className="my-auto text-2xl mx-1">0xNotes</span>
         </div>
         <div style={{ display: isLoggedIn ? 'none' : 'block' }} className="ml-auto">
@@ -82,7 +83,7 @@ export default function Home() {
           <div className="sm:flex">
             <div className="mt-8 sm:mb-8 sm:w-full sm:px-8 flex flex-col md:flex-row justify-between">
               <div className="flex flex-col">
-                <img src="/logo/1rev.png" alt="0xNotes logo" className="h-40" />
+                <Image src="/logo/1rev.png" alt="0xNotes logo" className="h-40" />
                 <br></br>
                 
               </div>
