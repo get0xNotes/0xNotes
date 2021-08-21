@@ -156,7 +156,7 @@ export default function Signup() {
                         <span>{zxcvbn(password).feedback.warning}</span>
                     </div>
                     <label className="mx-1">Confirm password</label>
-                    <input id="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="password" name="confirm" placeholder="Confirm password"></input>
+                    <input id="confirm" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="password" name="confirm" placeholder="Confirm password"></input>
                     <div style={{ display: password != confirm ? "block" : "none" }} className="m-1 p-2 bg-gray-600 rounded-md">
                         <span className="mx-1 text-red-500">Passwords do not match.</span>
                     </div>

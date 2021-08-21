@@ -97,7 +97,7 @@ export default function Login() {
                     <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="password" name="password" placeholder="Password"></input>
                     <div className="mx-1 mt-1">
                         <input id="longsession" value="1" type="checkbox"></input>
-                        <label for="longsession" className="ml-1">Keep me logged in for a week.</label>
+                        <label htmlFor="longsession" className="ml-1">Keep me logged in for a week.</label>
                     </div>
                 </div>
                 <button disabled={isLoading ? true : false} className="accent mt-1 mx-1 p-2 rounded-md" onClick={(e) => login(username, password)}>{isLoading ? "Loading..." : "Login"}</button>
