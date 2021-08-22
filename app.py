@@ -145,12 +145,12 @@ def list_notes():
             try:
                 with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
                     with conn.cursor() as cur:
-                        cur.execute("SELECT id, type, server_nonce, title_nonce, title FROM notes WHERE author=%s", (username,))
+                        cur.execute("SELECT id, type, server_nonce, title_nonce, title, modified FROM notes WHERE author=%s", (username,))
                         notes = cur.fetchall()
                         notes_decrypted = []
                         for note in notes:
                             c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
-                            notes_decrypted.append({"id": note[0], "type": note[1], "title": base64.b64encode(c1.decrypt(base64.b64decode(note[4]))).decode(), "title_nonce": note[3]})
+                            notes_decrypted.append({"id": note[0], "modified": note[5].timestamp(), "type": note[1], "title": base64.b64encode(c1.decrypt(base64.b64decode(note[4]))).decode(), "title_nonce": note[3]})
                         return(jsonify({'success': True, 'notes': notes_decrypted}))
             except:
                 return(jsonify({'success': False, 'error': 'Database error'}))
