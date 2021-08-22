@@ -100,14 +100,15 @@ def get_session():
 @app.route('/api/v1/notes/create', methods=['POST'])
 def create_notes():
     try:
+        data = request.json
         auth = request.headers.get('Authorization')
         session = auth.split("Bearer ")[1]
-        username = request.form.get('username')
-        notes_type = request.form.get('type')
-        title = base64.b64decode(request.form.get('title'))
-        title_nonce = request.form.get('title_nonce')
-        notes = base64.b64decode(request.form.get('notes'))
-        notes_nonce = request.form.get('notes_nonce')
+        username = data["username"]
+        notes_type = data["type"]
+        title = base64.b64decode(data["title"])
+        title_nonce = data["title_nonce"]
+        notes = base64.b64decode(data["notes"])
+        notes_nonce = data["notes_nonce"]
     except Exception as e:
         return jsonify({'success': False, 'error': 'Invalid request'})
 
@@ -153,6 +154,8 @@ def list_notes():
                         return(jsonify({'success': True, 'notes': notes_decrypted}))
             except:
                 return(jsonify({'success': False, 'error': 'Database error'}))
+        else:
+            return(jsonify({'success': False, 'error': 'Invalid session token'}))
     
 
 if __name__ == '__main__':
