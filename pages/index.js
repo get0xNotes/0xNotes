@@ -83,7 +83,7 @@ export default function Home() {
           <div className="sm:flex">
             <div className="mt-8 sm:mb-8 sm:w-full sm:px-8 flex flex-col md:flex-row justify-between">
               <div className="flex flex-col">
-                <Image src="/logo/1rev.png" alt="0xNotes footer logo" className="h-40" width={100} height={100}/>
+                <Image src="/logo/1revrev.png" alt="0xNotes footer logo" className="h-40" width={100} height={100}/>
                 <br></br>
                 
               </div>
