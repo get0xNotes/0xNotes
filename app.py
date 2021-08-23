@@ -132,6 +132,41 @@ def create_notes():
     except:
         return jsonify({'success': False, 'error': 'Database error'})
 
+@app.route('/api/v1/notes/update/<int:note_id>', methods=['POST'])
+def update_notes(note_id):
+    try:
+        data = request.json
+        auth = request.headers.get('Authorization')
+        session = auth.split("Bearer ")[1]
+        username = data["username"]
+        title = base64.b64decode(data["title"])
+        title_nonce = data["title_nonce"]
+        notes = base64.b64decode(data["notes"])
+        notes_nonce = data["notes_nonce"]
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Invalid request'})
+
+    if not session or not username or not title or not title_nonce or not notes or not notes_nonce:
+        return jsonify({'success': False, 'error': 'Missing required fields'})
+
+    if not decode_jwt(session, username):
+        return jsonify({'success': False, 'error': 'Invalid session'})
+
+    server_nonce = get_random_bytes(8)
+    c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
+    c2 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
+    title_encrypted = base64.b64encode(c1.encrypt(title)).decode('utf-8')
+    notes_encrypted = base64.b64encode(c2.encrypt(notes)).decode('utf-8')
+
+    try:
+        with psycopg.connect(os.environ.get('POSTGRES_URL')) as conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE notes SET server_nonce=%s, title=%s, title_nonce=%s, note=%s, notes_nonce=%s WHERE id=%s AND author=%s", (server_nonce.hex(), title_encrypted, title_nonce, notes_encrypted, notes_nonce, note_id, username))
+                return jsonify({'success': True})
+    except Exception as e:
+        print(e)
+        return jsonify({'success': False, 'error': 'Database error'})
+
 @app.route('/api/v1/notes/list', methods=['GET'])
 def list_notes():
     auth = request.headers.get('Authorization')
@@ -156,6 +191,36 @@ def list_notes():
                 return(jsonify({'success': False, 'error': 'Database error'}))
         else:
             return(jsonify({'success': False, 'error': 'Invalid session token'}))
+
+@app.route('/api/v1/notes/<int:note_id>', methods=['GET'])
+def get_note(note_id):
+    auth = request.headers.get('Authorization')
+    username = request.args.get('username')
+    if not auth or not username:
+        return(jsonify({'success': False, 'error': 'Missing session token or username'}))
+
+    session = auth.split("Bearer ")[1]
+    authorized = decode_jwt(session, username)
+
+    if authorized:
+        try:
+            with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT id, type, server_nonce, notes_nonce, note FROM notes WHERE id=%s AND author=%s", (note_id, username))
+                    note = cur.fetchone()
+                    if note:
+                        c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
+                        noteText = base64.b64encode(c1.decrypt(base64.b64decode(note[4]))).decode()
+                        return(jsonify({'success': True, 'note': noteText, 'nonce': note[3]}))
+                    else:
+                        return(jsonify({'success': False, 'error': 'Note not found'}))
+        except Exception as e:
+            print(e)
+            return(jsonify({'success': False, 'error': 'Database error'}))
+    else:
+        return(jsonify({'success': False, 'error': 'Invalid session token'}))
+
+
     
 
 if __name__ == '__main__':
