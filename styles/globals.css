@@ -9,3 +9,52 @@
 html {
   background-color: #121212;
 }
+
+.ck h2 {
+  display: block;
+  font-size: 1.5em;
+  margin-top: 0.83em;
+  margin-bottom: 0.83em;
+  margin-left: 0;
+  margin-right: 0;
+  font-weight: bold;
+}
+
+.ck h3 {
+  display: block;
+  font-size: 1.17em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 0;
+  font-weight: bold;
+}
+
+.ck h4 {
+  display: block;
+  margin-top: 1.33em;
+  margin-bottom: 1.33em;
+  margin-left: 0;
+  margin-right: 0;
+  font-weight: bold;
+}
+
+.ck a:link {
+  color: #0000f0;
+  text-decoration: underline;
+  cursor: auto;
+}
+
+.ck a:visited {
+  color: #0000f0;
+  text-decoration: underline;
+  cursor: auto;
+}
+
+.ck a:link:active {
+  color: #0000f0;
+}
+
+.ck a:visited:active {
+  color: #0000f0;
+}
