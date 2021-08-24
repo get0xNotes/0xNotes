@@ -58,3 +58,7 @@ html {
 .ck a:visited:active {
   color: #0000f0;
 }
+
+.ck-editor__editable:not(.ck-read-only) .ck-widget_selected .ck-media__wrapper>:not(.ck-media__placeholder) {
+  pointer-events: initial  !important;
+} 
