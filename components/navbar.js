@@ -6,7 +6,7 @@ export default function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
 
     useEffect(() => {
-        if (localStorage.getItem("e_key") && localStorage.getItem("a_key") && localStorage.getItem("user")) {
+        if (localStorage.getItem("ENCRYPTION_KEY") && localStorage.getItem("SESSION_TOKEN") && localStorage.getItem("USERNAME")) {
             setIsLoggedIn(true)
         } else {
             setIsLoggedIn(false)
