@@ -8,31 +8,6 @@ const pako = require('pako');
 const axios = require('axios');
 const moment = require('moment-timezone');
 
-const editorConfig = {
-
-    toolbar:
-        [
-            'heading',
-            '|',
-            'bold',
-            'italic',
-            'underline',
-            'highlight',
-            'link',
-            'alignment',
-            'bulletedList',
-            'numberedList',
-            '|',
-            'codeBlock',
-            'imageInsert',
-            'mediaEmbed',
-            'blockQuote',
-            'insertTable',
-            'undo',
-            'redo'
-        ]
-}
-
 export default function Dashboard() {
     const [notesInfo, setNotesInfo] = useState([])
     const [showModal, setShowModal] = useState(false)
@@ -45,6 +20,37 @@ export default function Dashboard() {
     const { CKEditor, Editor } = editorRef.current || {}
 
     const router = useRouter()
+
+    const editorConfig = {
+        toolbar:
+            [
+                'heading',
+                '|',
+                'bold',
+                'italic',
+                'underline',
+                'highlight',
+                'link',
+                'alignment',
+                'bulletedList',
+                'numberedList',
+                'todoList',
+                '|',
+                'codeBlock',
+                'imageInsert',
+                'mediaEmbed',
+                'blockQuote',
+                'insertTable',
+                'undo',
+                'redo'
+            ],
+        autosave: {
+            watingTime: 5000,
+            save(editor) {
+                return updateNote( editor.getData() );
+            }
+        }
+    }
 
     function hexStringToByte(str) {
         if (!str) {
@@ -191,27 +197,23 @@ export default function Dashboard() {
         }
     }
 
-    async function updateNote(note, bypassWait = false) {
-        setNoteText(note)
-        if (bypassWait || parseInt(moment().format("X")) > lastUpdate + 5) {
-            setLastUpdate(parseInt(moment().format("X")))
-            if (process.browser) {
-                var note_ec = await encryptAndCompressNote(note)
-                var note_encrypted = note_ec[0]
-                var note_nonce = note_ec[1]
-                var title = note.match(/<h2>(.*?)<\/h2>/).length > 1 ? note.match(/<h2>(.*?)<\/h2>/)[1] : "Unnamed Note"
-                var title_ec = await encryptAndCompressNote(title)
-                var title_encrypted = title_ec[0]
-                var title_nonce = title_ec[1]
-                var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "notes": note_encrypted, "notes_nonce": note_nonce, "title": title_encrypted, "title_nonce": title_nonce }
-                axios.post(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/update/" + noteId, data, { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } }).then((response) => {
-                    if (response.data.success) {
-                        console.log("Note updated!")
-                    } else {
-                        console.log(response.data.error)
-                    }
-                })
-            }
+    async function updateNote(note) {
+        if (process.browser) {
+            var note_ec = await encryptAndCompressNote(note)
+            var note_encrypted = note_ec[0]
+            var note_nonce = note_ec[1]
+            var title = note.match(/<h2>(.*?)<\/h2>/).length > 1 ? note.match(/<h2>(.*?)<\/h2>/)[1] : "Unnamed Note"
+            var title_ec = await encryptAndCompressNote(title)
+            var title_encrypted = title_ec[0]
+            var title_nonce = title_ec[1]
+            var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "notes": note_encrypted, "notes_nonce": note_nonce, "title": title_encrypted, "title_nonce": title_nonce }
+            axios.post(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/update/" + noteId, data, { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } }).then((response) => {
+                if (response.data.success) {
+                    console.log("Note updated!")
+                } else {
+                    console.log(response.data.error)
+                }
+            })
         }
     }
 
@@ -222,7 +224,7 @@ export default function Dashboard() {
     }
 
     function closeEditor() {
-        updateNote(noteText, true)
+        updateNote(noteText)
         setShowModal(false)
         loadNotes()
     }
@@ -262,7 +264,7 @@ export default function Dashboard() {
                         <div className="relative w-auto my-6 mx-auto max-w-3xl">
                             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 <div className="relative p-6 flex-auto">
-                                    {editorLoaded ? <CKEditor id="editor" config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { updateNote(editor.getData()) }} /> : null}
+                                    {editorLoaded ? <CKEditor id="editor" config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { setNoteText(editor.getData()) }}/> : null}
                                 </div>
                                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                                     <button
