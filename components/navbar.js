@@ -15,10 +15,12 @@ export default function Navbar() {
 
     return (
         <header className="flex p-4 w-full text-white bg-gray-700">
-            <div className="my-auto flex">
-                <Image src="/logo/2rev.png" alt="0xNotes header logo" width={30} height={30} className="h-8 my-auto mx-1" />
-                <span className="my-auto text-2xl mx-1">0xNotes</span>
-            </div>
+            <Link href="/">
+                <a className="my-auto flex">
+                    <Image src="/logo/2rev.png" alt="0xNotes header logo" width={30} height={30} className="h-8 my-auto mx-1" />
+                    <span className="my-auto text-2xl mx-1">0xNotes</span>
+                </a>
+            </Link>
             <div style={{ display: isLoggedIn ? 'none' : 'block' }} className="ml-auto">
                 <Link href="/login">
                     <a className="mx-1">Login</a>
