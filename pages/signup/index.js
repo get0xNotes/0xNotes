@@ -3,6 +3,8 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import sanitizeHtml from 'sanitize-html'
+import Navbar from '../../components/navbar'
+import Footer from '../../components/footer'
 const axios = require('axios');
 const zxcvbn = require('zxcvbn');
 
@@ -136,8 +138,10 @@ export default function Signup() {
             </Head>
             <div>
 
+            <Navbar />
+
             </div>
-            <div className="flex flex-col login-card m-auto p-6 rounded-md xl:w-1/3 md:w-2/4 w-4/5">
+            <div className="flex flex-col login-card mx-auto my-32 p-6 rounded-md xl:w-1/3 md:w-2/4 w-4/5">
                 <h1 className="mx-auto mb-5 sm:text-3xl text-2xl font-bold">Create your 0xNotes account</h1>
                 <div className="my-5 flex flex-col">
                     <label className="mx-1">Username</label>
@@ -170,7 +174,7 @@ export default function Signup() {
                     </Link>.
                 </span>
             </div>
-            <footer className="p-4 w-screen bg-gray-700">&copy; Copyright 2021 0xNotes &#183; GitHub &#183; Terms &#183; Privacy</footer>
+            <Footer/>
         </div>
     )
 }

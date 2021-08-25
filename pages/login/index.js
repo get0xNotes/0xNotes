@@ -2,6 +2,8 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import Navbar from '../../components/navbar'
+import Footer from '../../components/footer'
 const axios = require('axios');
 
 export default function Login() {
@@ -85,10 +87,10 @@ export default function Login() {
             <Head>
                 <title>Login | 0xNotes</title>
             </Head>
-            <div>
 
-            </div>
-            <div className="flex flex-col login-card m-auto p-6 rounded-md xl:w-3/12 md:w-2/4 w-4/5">
+            <Navbar />
+
+            <div className="flex flex-col login-card mx-auto my-32 p-6 rounded-md xl:w-3/12 md:w-2/4 w-4/5">
                 <h1 className="mx-auto mb-5 sm:text-3xl text-2xl font-bold">Login to 0xNotes</h1>
                 <div className="my-5 flex flex-col">
                     <label className="mx-1">Username</label>
@@ -109,7 +111,7 @@ export default function Login() {
                     </Link>.
                 </span>
             </div>
-            <footer className="p-4 w-screen bg-gray-700">&copy; Copyright 2021 0xNotes &#183; GitHub &#183; Terms &#183; Privacy</footer>
+            <Footer />
         </div>
     )
 }
