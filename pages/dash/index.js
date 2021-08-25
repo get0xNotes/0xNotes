@@ -2,9 +2,36 @@ import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useRef, useState, useEffect } from 'react'
+import Navbar from '../../components/navbar'
+import Footer from '../../components/footer'
 const pako = require('pako');
 const axios = require('axios');
 const moment = require('moment-timezone');
+
+const editorConfig = {
+
+    toolbar:
+        [
+            'heading',
+            '|',
+            'bold',
+            'italic',
+            'underline',
+            'highlight',
+            'link',
+            'alignment',
+            'bulletedList',
+            'numberedList',
+            '|',
+            'codeBlock',
+            'imageInsert',
+            'mediaEmbed',
+            'blockQuote',
+            'insertTable',
+            'undo',
+            'redo'
+        ]
+}
 
 export default function Dashboard() {
     const [notesInfo, setNotesInfo] = useState([])
@@ -15,7 +42,7 @@ export default function Dashboard() {
 
     const editorRef = useRef()
     const [editorLoaded, setEditorLoaded] = useState(false)
-    const { CKEditor, ClassicEditor } = editorRef.current || {}
+    const { CKEditor, Editor } = editorRef.current || {}
 
     const router = useRouter()
 
@@ -150,8 +177,8 @@ export default function Dashboard() {
                 var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/" + id + "?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
                 if (response.data.success) {
                     try {
-                    var note = await decryptAndUncompressNote(response.data.note, response.data.nonce)
-                    setNoteText(note)
+                        var note = await decryptAndUncompressNote(response.data.note, response.data.nonce)
+                        setNoteText(note)
                     } catch {
                         setNoteText("<h1>Error Decrypting Note</h1><p>Try logging out and login again to reset the encryption key.</p>")
                     }
@@ -164,7 +191,7 @@ export default function Dashboard() {
         }
     }
 
-    async function updateNote(note, bypassWait=false) {
+    async function updateNote(note, bypassWait = false) {
         setNoteText(note)
         if (bypassWait || parseInt(moment().format("X")) > lastUpdate + 5) {
             setLastUpdate(parseInt(moment().format("X")))
@@ -203,7 +230,7 @@ export default function Dashboard() {
     useEffect(() => {
         editorRef.current = {
             CKEditor: require("@ckeditor/ckeditor5-react").CKEditor,
-            ClassicEditor: require("@ckeditor/ckeditor5-build-classic")
+            Editor: require("ckeditor5-custom-build/build/ckeditor"),
         }
         setEditorLoaded(true)
 
@@ -220,6 +247,7 @@ export default function Dashboard() {
             <Head>
                 <title>Dashboard | 0xNotes</title>
             </Head>
+            <Navbar />
             <div className="p-3 md:p-8 xl:p-12">
                 <button className="p-2 accent rounded-md" onClick={(e) => { createNote() }}>+ Create A New Note</button>
                 <div className="flex flex-wrap -mx-2 overflow-hidden">
@@ -234,7 +262,7 @@ export default function Dashboard() {
                         <div className="relative w-auto my-6 mx-auto max-w-3xl">
                             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 <div className="relative p-6 flex-auto">
-                                    {editorLoaded ? <CKEditor id="editor" data={noteText} editor={ClassicEditor} onChange={(e, editor) => {updateNote(editor.getData())}}/> : null}
+                                    {editorLoaded ? <CKEditor id="editor" config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { updateNote(editor.getData()) }} /> : null}
                                 </div>
                                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                                     <button
