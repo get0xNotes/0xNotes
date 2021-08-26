@@ -181,6 +181,7 @@ export default function Dashboard() {
     async function getNote(id) {
         // Show a loading text when the note is loading
         setNoteText("<h2>Loading Note...</h2>")
+        setNoteTitle("Loading Note...")
         if (process.browser) {
             try {
                 var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/" + id + "?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
@@ -192,12 +193,15 @@ export default function Dashboard() {
                         setNoteTitle(title)
                         setEditorDisabled(false)
                     } catch {
+                        setNoteTitle("Error Decrypting Note")
                         setNoteText("<h2>Error Decrypting Note</h2><p>Try logging out and login again to reset the encryption key.</p>")
                     }
                 } else {
+                    setNoteTitle("Error Retrieving Note")
                     setNoteText("<h2>Error Retrieving Note</h2><p>Your session might be expired. Try logging out and login again.</p>")
                 }
             } catch {
+                setNoteTitle("Error Retrieving Note")
                 setNoteText("<h2>Error Retrieving Note</h2><p>Please check if the server or your internet connection is down.</p>")
             }
         }
