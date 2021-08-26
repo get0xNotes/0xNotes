@@ -17,54 +17,38 @@ export default function Login() {
         return Array.prototype.map.call(new Uint8Array(buf), x => ('00' + x.toString(16)).slice(-2)).join('');
     }
 
-    function derive_and_set_key(username, password) {
-        if (process.browser) {
-            var encoder = new TextEncoder('utf-8');
-            window.crypto.subtle.importKey("raw", encoder.encode(password), { name: "PBKDF2" }, false, ['deriveBits']).then((key) => {
-                return window.crypto.subtle.deriveBits({ "name": "PBKDF2", "salt": encoder.encode(username), "iterations": 100000, "hash": "SHA-512" }, key, 512)
-            }).then((bits) => {
-                var keys = buffer2hex(bits)
-                var e_key = keys.substr(0, 64)
-                var a_key = keys.substr(64, 64)
-                localStorage.setItem("USERNAME", username)
-                localStorage.setItem("ENCRYPTION_KEY", e_key)
-                localStorage.setItem("AUTHENTICATION_KEY", a_key)
-            })
-        }
-    }
-
-    function getSessionToken() {
-        var a_key = localStorage.getItem("AUTHENTICATION_KEY")
+    async function getSessionToken(auth_key) {
         var username = localStorage.getItem("USERNAME")
         var longsession = document.getElementById("longsession").checked ? 1 : 0
-        axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user/session?auth=" + a_key + "&username=" + username + "&long_session=" + longsession).then((response) => {
+        try {
+            var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user/session?auth=" + auth_key + "&username=" + username + "&long_session=" + longsession)
             if (response.data.session) {
-                localStorage.removeItem("AUTHENTICATION_KEY")
                 localStorage.setItem("SESSION_TOKEN", response.data.jwt)
                 router.push("/dash")
             } else {
-                localStorage.removeItem("AUTHENTICATION_KEY")
                 localStorage.removeItem("ENCRYPTION_KEY")
                 alert("Error: Invalid credentials or user does not exist.")
             }
-            setIsLoading(false)
-        }).catch((error) => {
-            localStorage.removeItem("AUTHENTICATION_KEY")
-            localStorage.removeItem("ENCRYPTION_KEY")
-            alert(error)
-            setIsLoading(false)
-        })
-
+        } catch (error) {
+            alert("Error: Something wrong with the server.")
+            console.log(error)
+        }
+        setIsLoading(false)
     }
 
-    function login(username, password) {
+    async function login(username, password) {
         setIsLoading(true)
-        if (username && password) {
-            setIsLoading(true)
-            derive_and_set_key(username, password)
-            setTimeout(() => {
-                getSessionToken()
-            }, 100)
+        if (username && password && process.browser) {
+            var encoder = new TextEncoder('utf-8');
+            var key = await window.crypto.subtle.importKey("raw", encoder.encode(password), { name: "PBKDF2" }, false, ['deriveBits'])
+            var bits = await window.crypto.subtle.deriveBits({ "name": "PBKDF2", "salt": encoder.encode(username), "iterations": 100000, "hash": "SHA-512" }, key, 512)
+
+            var keys = buffer2hex(bits)
+            var e_key = keys.substr(0, 64)
+            var a_key = keys.substr(64, 64)
+            localStorage.setItem("USERNAME", username)
+            localStorage.setItem("ENCRYPTION_KEY", e_key)
+            await getSessionToken(a_key)
         } else {
             alert("Username and password are required.")
             setIsLoading(false)
