@@ -2,13 +2,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Footer() {
-    return (
-        <footer className="bg-gray-700 relative pt-1">
-        <div className="container mx-auto px-6">
+  return (
+    <footer className="relative h-0">
+      <div className="bg-gray-700 pt-1">
+        <div className="container mx-auto px-6 bg-gray-700">
           <div className="sm:flex">
             <div className="mt-8 sm:mb-8 sm:w-full sm:px-8 flex flex-col md:flex-row justify-between">
               <div className="mx-auto flex-1">
-                <Image src="/logo/1revrev.png" alt="0xNotes footer logo" className="" width={100} height={100}/>
+                <Image src="/logo/1revrev.png" alt="0xNotes footer logo" className="" width={100} height={100} />
               </div>
               <div className="flex flex-col flex-1">
                 <span className="font-bold text-white mt-4 md:mt-0 mb-2">About Us</span>
@@ -31,10 +32,11 @@ export default function Footer() {
           </div>
           <div>
             <p className="text-white text-center w-full pb-8">
-               © Copyright 2021 0xNotes
+              © Copyright 2021 0xNotes
             </p>
           </div>
         </div>
-      </footer>
-    )
+      </div>
+    </footer>
+  )
 }

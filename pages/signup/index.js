@@ -141,7 +141,7 @@ export default function Signup() {
             <Navbar />
 
             </div>
-            <div className="flex flex-col login-card mx-auto my-32 p-6 rounded-md xl:w-1/3 md:w-2/4 w-4/5">
+            <div className="flex flex-col login-card mx-auto my-auto p-6 rounded-md xl:w-1/3 md:w-2/4 w-4/5">
                 <h1 className="mx-auto mb-5 sm:text-3xl text-2xl font-bold">Create your 0xNotes account</h1>
                 <div className="my-5 flex flex-col">
                     <label className="mx-1">Username</label>
