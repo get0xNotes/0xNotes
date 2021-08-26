@@ -1,9 +1,6 @@
 import Head from 'next/head'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
 import { useRef, useState, useEffect } from 'react'
 import Navbar from '../../components/navbar'
-import Footer from '../../components/footer'
 const pako = require('pako');
 const axios = require('axios');
 const moment = require('moment-timezone');
@@ -12,14 +9,13 @@ export default function Dashboard() {
     const [notesInfo, setNotesInfo] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [noteText, setNoteText] = useState("")
+    const [noteTitle, setNoteTitle] = useState("")
     const [noteId, setNoteId] = useState(0)
-    const [lastUpdate, setLastUpdate] = useState(0)
 
     const editorRef = useRef()
     const [editorLoaded, setEditorLoaded] = useState(false)
+    const [editorDisabled, setEditorDisabled] = useState(true)
     const { CKEditor, Editor } = editorRef.current || {}
-
-    const router = useRouter()
 
     const editorConfig = {
         toolbar:
@@ -45,9 +41,10 @@ export default function Dashboard() {
                 'redo'
             ],
         autosave: {
+            // Save on 5 seconds after last change
             watingTime: 5000,
             save(editor) {
-                return updateNote( editor.getData() );
+                return updateNote(noteTitle, editor.getData());
             }
         }
     }
@@ -145,22 +142,27 @@ export default function Dashboard() {
             for (var i = 0; i < notes.length; i++) {
                 var id = notes[i].id
                 var title = await decryptAndUncompressNote(notes[i].title, notes[i].title_nonce)
+
+                // Format the time to user's timezone
                 var date = moment.unix(notes[i].modified).tz(moment.tz.guess()).format("DD/MM/YYYY hh:mm z")
                 noteList.push({ "id": id, "title": title, "date": date })
             }
             setNotesInfo(noteList)
+
+            // Store the notes in localstorage for cache
             localStorage.setItem("NOTES_CACHE", JSON.stringify(noteList))
         }
     }
 
     async function createNote() {
         if (process.browser) {
+            // Ask the user for a title
             var title = window.prompt("Enter the title of the note:", "Untitled Note")
             if (title) {
                 var title_ec = await encryptAndCompressNote(title)
                 var title_encrypted = title_ec[0]
                 var title_nonce = title_ec[1]
-                var note_ec = await encryptAndCompressNote("<h1>" + title + "</h1>")
+                var note_ec = await encryptAndCompressNote("")
                 var note_encrypted = note_ec[0]
                 var note_nonce = note_ec[1]
                 var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "title": title_encrypted, "title_nonce": title_nonce, "notes": note_encrypted, "notes_nonce": note_nonce }
@@ -177,33 +179,45 @@ export default function Dashboard() {
     }
 
     async function getNote(id) {
-        setNoteText("<h1>Loading Note...</h1>")
+        // Show a loading text when the note is loading
+        setNoteText("<h2>Loading Note...</h2>")
         if (process.browser) {
             try {
                 var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/" + id + "?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
                 if (response.data.success) {
                     try {
                         var note = await decryptAndUncompressNote(response.data.note, response.data.nonce)
+                        var title = await decryptAndUncompressNote(response.data.title, response.data.title_nonce)
                         setNoteText(note)
+                        setNoteTitle(title)
+                        setEditorDisabled(false)
                     } catch {
-                        setNoteText("<h1>Error Decrypting Note</h1><p>Try logging out and login again to reset the encryption key.</p>")
+                        setNoteText("<h2>Error Decrypting Note</h2><p>Try logging out and login again to reset the encryption key.</p>")
                     }
                 } else {
-                    setNoteText("<h1>Error Retrieving Note</h1><p>Your session might be expired. Try logging out and login again.</p>")
+                    setNoteText("<h2>Error Retrieving Note</h2><p>Your session might be expired. Try logging out and login again.</p>")
                 }
             } catch {
-                setNoteText("<h1>Error Retrieving Note</h1><p>Please check if the server or your internet connection is down.</p>")
+                setNoteText("<h2>Error Retrieving Note</h2><p>Please check if the server or your internet connection is down.</p>")
             }
         }
     }
 
-    async function updateNote(note) {
+    async function updateTitle(title) {
+        setNoteTitle(title)
+    }
+
+    async function updateNote(title, note) {
+        if (editorDisabled) {
+            // If the editor is disabled (notes not loaded yet), don't update the note
+            return
+        }
+
         if (process.browser) {
             var note_ec = await encryptAndCompressNote(note)
             var note_encrypted = note_ec[0]
             var note_nonce = note_ec[1]
-            var title = note.match(/<h2>(.*?)<\/h2>/).length > 1 ? note.match(/<h2>(.*?)<\/h2>/)[1] : "Unnamed Note"
-            var title_ec = await encryptAndCompressNote(title)
+            var title_ec = await encryptAndCompressNote(title ? title : "Untitled Note")
             var title_encrypted = title_ec[0]
             var title_nonce = title_ec[1]
             var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "notes": note_encrypted, "notes_nonce": note_nonce, "title": title_encrypted, "title_nonce": title_nonce }
@@ -218,14 +232,26 @@ export default function Dashboard() {
     }
 
     function editNote(id) {
+        // Disable editing the note
+        setEditorDisabled(true)
         setNoteId(id)
+
+        // Retrieve the note from server
         getNote(id)
+
+        // Show the modal
         setShowModal(true)
     }
 
     function closeEditor() {
-        updateNote(noteText)
+        if (!editorDisabled) {
+            // When the modal is closed, only save the note if it has been loaded
+            updateNote(noteTitle, noteText)
+        }
+        // Hide the modal
         setShowModal(false)
+
+        // Refresh the notes cache
         loadNotes()
     }
 
@@ -264,7 +290,8 @@ export default function Dashboard() {
                         <div className="relative w-auto my-6 mx-auto max-w-3xl">
                             <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 <div className="relative p-6 flex-auto">
-                                    {editorLoaded ? <CKEditor id="editor" config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { setNoteText(editor.getData()) }}/> : null}
+                                    <input type="text" className="rounded border border-gray-400 w-full p-2 mb-4" placeholder="Title" value={noteTitle} onChange={(e) => updateTitle(e.target.value)}></input>
+                                    {editorLoaded ? <CKEditor id="editor" disabled={editorDisabled} config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { setNoteText(editor.getData()) }} /> : null}
                                 </div>
                                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                                     <button
