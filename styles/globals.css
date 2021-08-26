@@ -86,3 +86,7 @@ html {
 .ck-editor__editable:not(.ck-read-only) .ck-widget_selected .ck-media__wrapper>:not(.ck-media__placeholder) {
   pointer-events: initial  !important;
 } 
+
+.ck-editor__editable {
+  height: 50vh;
+}

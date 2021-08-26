@@ -291,9 +291,9 @@ export default function Dashboard() {
                     <div
                         className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-black"
                     >
-                        <div className="relative w-auto my-6 mx-auto max-w-3xl">
-                            <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                                <div className="relative p-6 flex-auto">
+                        <div className=" w-11/12 flex h-screen my-6 mx-auto max-w-3xl">
+                            <div className="border-0 my-auto h-auto rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                                <div className="p-6 flex-auto">
                                     <input type="text" className="rounded border border-gray-400 w-full p-2 mb-4" placeholder="Title" value={noteTitle} onChange={(e) => updateTitle(e.target.value)}></input>
                                     {editorLoaded ? <CKEditor id="editor" disabled={editorDisabled} config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { setNoteText(editor.getData()) }} /> : null}
                                 </div>
