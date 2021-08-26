@@ -121,8 +121,8 @@ def create_notes():
     server_nonce = get_random_bytes(8)
     c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
     c2 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
-    title_encrypted = base64.b64encode(c1.encrypt(title)).decode('utf-8')
-    notes_encrypted = base64.b64encode(c2.encrypt(notes)).decode('utf-8')
+    title_encrypted = base64.a85encode(c1.encrypt(title)).decode('utf-8')
+    notes_encrypted = base64.a85encode(c2.encrypt(notes)).decode('utf-8')
 
     try:
         with psycopg.connect(os.environ.get('POSTGRES_URL')) as conn:
@@ -155,8 +155,8 @@ def update_notes(note_id):
     server_nonce = get_random_bytes(8)
     c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
     c2 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=server_nonce)
-    title_encrypted = base64.b64encode(c1.encrypt(title)).decode('utf-8')
-    notes_encrypted = base64.b64encode(c2.encrypt(notes)).decode('utf-8')
+    title_encrypted = base64.a85encode(c1.encrypt(title)).decode('utf-8')
+    notes_encrypted = base64.a85encode(c2.encrypt(notes)).decode('utf-8')
 
     try:
         with psycopg.connect(os.environ.get('POSTGRES_URL')) as conn:
@@ -185,7 +185,7 @@ def list_notes():
                         notes_decrypted = []
                         for note in notes:
                             c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
-                            notes_decrypted.append({"id": note[0], "modified": note[5].timestamp(), "type": note[1], "title": base64.b64encode(c1.decrypt(base64.b64decode(note[4]))).decode(), "title_nonce": note[3]})
+                            notes_decrypted.append({"id": note[0], "modified": note[5].timestamp(), "type": note[1], "title": base64.b64encode(c1.decrypt(base64.a85decode(note[4]))).decode(), "title_nonce": note[3]})
                         return(jsonify({'success': True, 'notes': notes_decrypted}))
             except:
                 return(jsonify({'success': False, 'error': 'Database error'}))
@@ -210,7 +210,7 @@ def get_note(note_id):
                     note = cur.fetchone()
                     if note:
                         c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
-                        noteText = base64.b64encode(c1.decrypt(base64.b64decode(note[4]))).decode()
+                        noteText = base64.b64encode(c1.decrypt(base64.a85decode(note[4]))).decode()
                         return(jsonify({'success': True, 'note': noteText, 'nonce': note[3]}))
                     else:
                         return(jsonify({'success': False, 'error': 'Note not found'}))
