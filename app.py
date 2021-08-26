@@ -206,12 +206,14 @@ def get_note(note_id):
         try:
             with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
                 with conn.cursor() as cur:
-                    cur.execute("SELECT id, type, server_nonce, notes_nonce, note FROM notes WHERE id=%s AND author=%s", (note_id, username))
+                    cur.execute("SELECT id, type, server_nonce, notes_nonce, note, title_nonce, title FROM notes WHERE id=%s AND author=%s", (note_id, username))
                     note = cur.fetchone()
                     if note:
                         c1 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
+                        c2 = AES.new(SERVER_ENCRYPTION_KEY, AES.MODE_CTR, initial_value=0, nonce=bytes.fromhex(note[2]))
                         noteText = base64.b64encode(c1.decrypt(base64.a85decode(note[4]))).decode()
-                        return(jsonify({'success': True, 'note': noteText, 'nonce': note[3]}))
+                        noteTitle = base64.b64encode(c2.decrypt(base64.a85decode(note[6]))).decode()
+                        return(jsonify({'success': True, 'note': noteText, 'nonce': note[3], 'title': noteTitle, 'title_nonce': note[5]}))
                     else:
                         return(jsonify({'success': False, 'error': 'Note not found'}))
         except Exception as e:
