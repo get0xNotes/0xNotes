@@ -159,12 +159,8 @@ export default function Dashboard() {
             // Ask the user for a title
             var title = window.prompt("Enter the title of the note:", "Untitled Note")
             if (title) {
-                var title_ec = await encryptAndCompressNote(title)
-                var title_encrypted = title_ec[0]
-                var title_nonce = title_ec[1]
-                var note_ec = await encryptAndCompressNote("")
-                var note_encrypted = note_ec[0]
-                var note_nonce = note_ec[1]
+                var [title_encrypted, title_nonce] = await encryptAndCompressNote(title)
+                var [note_encrypted, note_nonce] = await encryptAndCompressNote("")
                 var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "title": title_encrypted, "title_nonce": title_nonce, "notes": note_encrypted, "notes_nonce": note_nonce }
                 axios.post(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/create", data, { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } }).then((response) => {
                     if (response.data.success) {
@@ -218,12 +214,8 @@ export default function Dashboard() {
         }
 
         if (process.browser) {
-            var note_ec = await encryptAndCompressNote(note)
-            var note_encrypted = note_ec[0]
-            var note_nonce = note_ec[1]
-            var title_ec = await encryptAndCompressNote(title ? title : "Untitled Note")
-            var title_encrypted = title_ec[0]
-            var title_nonce = title_ec[1]
+            var [title_encrypted, title_nonce] = await encryptAndCompressNote(title ? title : "Untitled Note")
+            var [note_encrypted, note_nonce] = await encryptAndCompressNote(note)
             var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "notes": note_encrypted, "notes_nonce": note_nonce, "title": title_encrypted, "title_nonce": title_nonce }
             axios.post(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/update/" + noteId, data, { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } }).then((response) => {
                 if (response.data.success) {
