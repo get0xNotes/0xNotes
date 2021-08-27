@@ -22,7 +22,10 @@ export default function Signup() {
     }
 
     function setAndCheckUsername(username) {
-        setUsername(username)
+        // Only allow alphanumeric, dash, underscore and dot
+        // Username also must be lowercased
+        setUsername(username.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase())
+        
         var uAvailText = document.getElementById("unameavailability")
 
         if (username.length == 0) {
