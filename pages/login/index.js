@@ -78,7 +78,7 @@ export default function Login() {
                 <h1 className="mx-auto mb-5 sm:text-3xl text-2xl font-bold">Login to 0xNotes</h1>
                 <div className="my-5 flex flex-col">
                     <label className="mx-1">Username</label>
-                    <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="text" name="username" placeholder="Username"></input>
+                    <input id="username" value={username} onChange={(e) => setUsername(e.target.value.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase())} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="text" name="username" placeholder="Username"></input>
                     <label className="mx-1">Password</label>
                     <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="password" name="password" placeholder="Password"></input>
                     <div className="mx-1 mt-1">
