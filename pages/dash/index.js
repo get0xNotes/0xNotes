@@ -177,7 +177,6 @@ export default function Dashboard() {
     async function getNote(id) {
         // Show a loading text when the note is loading
         setNoteText("<h2>Loading Note...</h2>")
-        setNoteTitle("Loading Note...")
         if (process.browser) {
             try {
                 var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/" + id + "?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
@@ -208,11 +207,6 @@ export default function Dashboard() {
     }
 
     async function updateNote(title, note) {
-        if (editorDisabled) {
-            // If the editor is disabled (notes not loaded yet), don't update the note
-            return
-        }
-
         if (process.browser) {
             var [title_encrypted, title_nonce] = await encryptAndCompressNote(title ? title : "Untitled Note")
             var [note_encrypted, note_nonce] = await encryptAndCompressNote(note)
@@ -227,10 +221,13 @@ export default function Dashboard() {
         }
     }
 
-    function editNote(id) {
+    function editNote(id, title) {
         // Disable editing the note
         setEditorDisabled(true)
         setNoteId(id)
+
+        // Set the title from cache
+        setNoteTitle(title)
 
         // Retrieve the note from server
         getNote(id)
@@ -275,7 +272,7 @@ export default function Dashboard() {
             <div className="p-3 md:p-8 xl:p-12">
                 <button className="p-2 accent rounded-md" onClick={(e) => { createNote() }}>+ Create A New Note</button>
                 <div className="flex flex-wrap -mx-2 overflow-hidden">
-                    {notesInfo.map(note => (<div key={note.id} className="my-2 px-2 w-full overflow-hidden sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 cursor-pointer" onClick={(e) => { editNote(note.id) }}><div className="h-full break-words bg-gray-600 rounded-md p-3"><h3 className="text-lg">{note.title}</h3><span className="font-thin">{note.date}</span></div></div>))}
+                    {notesInfo.map(note => (<div key={note.id} className="my-2 px-2 w-full overflow-hidden sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 cursor-pointer" onClick={(e) => { editNote(note.id, note.title) }}><div className="h-full break-words bg-gray-600 rounded-md p-3"><h3 className="text-lg">{note.title}</h3><span className="font-thin">{note.date}</span></div></div>))}
                 </div>
             </div>
             {showModal ?
