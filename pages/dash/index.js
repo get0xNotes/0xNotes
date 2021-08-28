@@ -286,7 +286,7 @@ export default function Dashboard() {
                         <div className=" w-11/12 flex h-screen my-6 mx-auto max-w-3xl">
                             <div className="border-0 my-auto h-auto rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                                 <div className="p-6 flex-auto">
-                                    <input type="text" className="rounded border border-gray-400 w-full p-2 mb-4" placeholder="Title" value={noteTitle} onChange={(e) => updateTitle(e.target.value)}></input>
+                                    <input type="text" disabled={editorDisabled} className="rounded border border-gray-400 w-full p-2 mb-4" placeholder="Title" value={noteTitle} onChange={(e) => updateTitle(e.target.value)}></input>
                                     {editorLoaded ? <CKEditor id="editor" disabled={editorDisabled} config={editorConfig} data={noteText} editor={Editor} onChange={(e, editor) => { setNoteText(editor.getData()) }} /> : null}
                                 </div>
                                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
