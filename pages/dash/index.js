@@ -151,6 +151,14 @@ export default function Dashboard() {
 
             // Store the notes in localstorage for cache
             localStorage.setItem("NOTES_CACHE", JSON.stringify(noteList))
+        } else {
+            if (response.data.error == "Invalid session token") {
+                alert("Session expired, please login again.")
+                localStorage.removeItem("SESSION_TOKEN")
+                localStorage.removeItem("ENCRYPTION_TOKEN")
+                localStorage.removeItem("NOTES_CACHE")
+                router.push("/login")
+            }
         }
     }
 
