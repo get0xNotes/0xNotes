@@ -316,6 +316,7 @@ export default function Dashboard() {
                     <input className="flex-1 rounded-md p-2 bg-gray-700 mb-4 md:mb-0 mr-0 md:mr-4" placeholder="Search" onChange={(e) => { searchNotes(e.target.value) }} value={search}></input>
                     <div className="flex-1 flex flex-row">
                         <select id="sort" className="flex-1 bg-gray-700 p-2 rounded-md mr-2" onChange={(e) => {sortNotes(e.target.value)}}>
+                            <option selected disabled hidden>Sort</option>
                             <option value="newest">Newest</option>
                             <option value="oldest">Oldest</option>
                             <option value="alphabetical">Alphabetical</option>
