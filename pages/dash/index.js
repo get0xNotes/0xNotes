@@ -42,7 +42,7 @@ export default function Dashboard() {
             ],
         autosave: {
             // Save on 5 seconds after last change
-            watingTime: 5000,
+            waitingTime: 5000,
             save(editor) {
                 return updateNote(noteTitle, editor.getData());
             }
