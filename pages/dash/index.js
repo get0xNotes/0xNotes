@@ -12,6 +12,9 @@ export default function Dashboard() {
     const [noteTitle, setNoteTitle] = useState("")
     const [noteId, setNoteId] = useState(0)
 
+    const [search, setSearch] = useState("")
+    const [sort, setSort] = useState("newest")
+
     const editorRef = useRef()
     const [editorLoaded, setEditorLoaded] = useState(false)
     const [editorDisabled, setEditorDisabled] = useState(true)
@@ -144,8 +147,7 @@ export default function Dashboard() {
                 var title = await decryptAndUncompressNote(notes[i].title, notes[i].title_nonce)
 
                 // Format the time to user's timezone
-                var date = moment.unix(notes[i].modified).tz(moment.tz.guess()).format("DD/MM/YYYY hh:mm z")
-                noteList.push({ "id": id, "title": title, "date": date })
+                noteList.push({ "id": id, "title": title, "date": notes[i].modified, "visible": true })
             }
             setNotesInfo(noteList)
 
@@ -256,6 +258,38 @@ export default function Dashboard() {
         loadNotes()
     }
 
+    function searchNotes(keyword) {
+        setSearch(keyword)
+        var ni = notesInfo
+        for (var i = 0; i < ni.length; i++) {
+            if (!ni[i].title.toLowerCase().includes(keyword.toLowerCase())) {
+                ni[i].visible = false
+            } else {
+                ni[i].visible = true
+            }
+        }
+        setNotesInfo(ni)
+    }
+
+    function sortNotes(sort) {
+        setSort(sort)
+        var ni = notesInfo
+        if (sort == "newest") {
+            ni.sort((a, b) => {
+                return b.date - a.date
+            })
+        } else if (sort == "oldest") {
+            ni.sort((a, b) => {
+                return a.date - b.date
+            })
+        } else if (sort == "alphabetical") {
+            ni.sort((a, b) => {
+                return a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+            })
+        }
+        setNotesInfo(ni)
+    }
+
     useEffect(() => {
         editorRef.current = {
             CKEditor: require("@ckeditor/ckeditor5-react").CKEditor,
@@ -278,9 +312,19 @@ export default function Dashboard() {
             </Head>
             <Navbar />
             <div className="p-3 md:p-8 xl:p-12">
-                <button className="p-2 accent rounded-md" onClick={(e) => { createNote() }}>+ Create A New Note</button>
+                <div className="flex flex-col md:flex-row mb-2">
+                    <input className="flex-1 rounded-md p-2 bg-gray-700 mb-4 md:mb-0 mr-0 md:mr-4" placeholder="Search" onChange={(e) => { searchNotes(e.target.value) }} value={search}></input>
+                    <div className="flex-1 flex flex-row">
+                        <select id="sort" className="flex-1 bg-gray-700 p-2 rounded-md mr-2" onChange={(e) => {sortNotes(e.target.value)}}>
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="alphabetical">Alphabetical</option>
+                        </select>
+                        <button className="flex-1 p-2 accent rounded-md ml-2" onClick={(e) => { createNote() }}>+ Create A New Note</button>
+                    </div>
+                </div>
                 <div className="flex flex-wrap -mx-2 overflow-hidden">
-                    {notesInfo.map(note => (<div key={note.id} className="my-2 px-2 w-full overflow-hidden sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 cursor-pointer" onClick={(e) => { editNote(note.id, note.title) }}><div className="h-full break-words bg-gray-600 rounded-md p-3"><h3 className="text-lg">{note.title}</h3><span className="font-thin">{note.date}</span></div></div>))}
+                    {notesInfo.map(note => (<div key={note.id} style={{ display: note.visible ? "block" : "none" }} className="my-2 px-2 w-full overflow-hidden sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 cursor-pointer" onClick={(e) => { editNote(note.id, note.title) }}><div className="h-full break-words bg-gray-600 rounded-md p-3"><h3 className="text-lg">{note.title}</h3><span className="font-thin">{moment.unix(note.date).tz(moment.tz.guess()).format("llll z")}</span></div></div>))}
                 </div>
             </div>
             {showModal ?
