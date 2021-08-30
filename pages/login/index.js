@@ -9,6 +9,7 @@ const axios = require('axios');
 export default function Login() {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [twoFA, setTwoFA] = useState("")
     const [isLoading, setIsLoading] = useState(false)
 
     const router = useRouter()
@@ -21,13 +22,13 @@ export default function Login() {
         var username = localStorage.getItem("USERNAME")
         var longsession = document.getElementById("longsession").checked ? 1 : 0
         try {
-            var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user/session?auth=" + auth_key + "&username=" + username + "&long_session=" + longsession)
+            var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/user/session?auth=" + auth_key + "&username=" + username + "&long_session=" + longsession + "&2fa=" + twoFA)
             if (response.data.session) {
                 localStorage.setItem("SESSION_TOKEN", response.data.jwt)
                 router.push("/dash")
             } else {
                 localStorage.removeItem("ENCRYPTION_KEY")
-                alert("Error: Invalid credentials or user does not exist.")
+                alert("Error: " + response.data.error)
             }
         } catch (error) {
             alert("Error: Something wrong with the server.")
@@ -81,6 +82,8 @@ export default function Login() {
                     <input id="username" value={username} onChange={(e) => setUsername(e.target.value.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase())} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="text" name="username" placeholder="Username"></input>
                     <label className="mx-1">Password</label>
                     <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="password" name="password" placeholder="Password"></input>
+                    <label className="mx-1">2FA (if enabled)</label>
+                    <input id="2fa" value={twoFA} onChange={(e) => setTwoFA(e.target.value)} className="mx-auto w-full p-2 rounded-md border-4 border-gray-800 text-black" type="text" name="2fa" placeholder="2FA (if enabled)"></input>
                     <div className="mx-1 mt-1">
                         <input id="longsession" value="1" type="checkbox"></input>
                         <label htmlFor="longsession" className="ml-1">Keep me logged in for a week.</label>
