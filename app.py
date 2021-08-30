@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
-import os, psycopg, jwt, time, string, base64
+import os, psycopg, jwt, time, string, base64, pyotp
 from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import SHA512
@@ -80,6 +80,7 @@ def check_username_availability_flask():
 def get_session():
     username = request.args.get('username')
     auth = request.args.get('auth')
+    twofa = request.args.get('2fa', '')
 
     if request.args.get('long_session', "0") == "1":
         long_session = True
@@ -91,11 +92,21 @@ def get_session():
 
     with psycopg.connect(os.environ.get('POSTGRES_URL')) as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM users WHERE username=%s AND auth=%s", (username, auth))
-            if cur.fetchone():
-                return jsonify({'session': True, 'jwt': encode_jwt(username, long_session)})
+            cur.execute("SELECT totp FROM users WHERE username=%s AND auth=%s", (username, auth))
+            res = cur.fetchone()
+            if res:
+                if res[0]:
+                    if twofa:
+                        if pyotp.TOTP(res[0]).verify(twofa, valid_window=1):
+                            return jsonify({'session': True, 'jwt': encode_jwt(username, long_session)})
+                        else:
+                            return jsonify({'session': False, 'error': 'Invalid 2FA code'})
+                    else:
+                        return jsonify({'session': False, 'error': '2FA code required'})
+                else:
+                    return jsonify({'session': True, 'jwt': encode_jwt(username, long_session)})
             else:
-                return jsonify({'session': False})
+                return jsonify({'session': False, 'error': 'Invalid credentials or user does not exist'})
 
 @app.route('/api/v1/notes/create', methods=['POST'])
 def create_notes():
@@ -222,8 +233,70 @@ def get_note(note_id):
     else:
         return(jsonify({'success': False, 'error': 'Invalid session token'}))
 
+@app.route('/api/v1/user/totp', methods=['GET'])
+def get_totp():
+    auth = request.headers.get('Authorization')
+    username = request.args.get('username')
+    if not auth or not username:
+        return(jsonify({'success': False, 'error': 'Missing session token or username'}))
 
-    
+    session = auth.split("Bearer ")[1]
+    authorized = decode_jwt(session, username)
+    if authorized:
+        try:
+            with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT totp FROM users WHERE username=%s", (username,))
+                    totp = cur.fetchone()[0]
+                    if totp:
+                        totp_uri = pyotp.totp.TOTP(totp).provisioning_uri(name=username, issuer_name="0xNotes")
+                        return (jsonify({'success': True, 'enabled': True, 'totp': totp, 'totp_uri': totp_uri}))
+                    else:
+                        return(jsonify({'success': True, 'enabled': False}))
+        except:
+            return(jsonify({'success': False, 'error': 'Something went wrong'}))
+
+@app.route('/api/v1/user/totp/enable', methods=['GET'])
+def enable_totp():
+    auth = request.headers.get('Authorization')
+    username = request.args.get('username')
+    if not auth or not username:
+        return(jsonify({'success': False, 'error': 'Missing session token or username'}))
+
+    session = auth.split("Bearer ")[1]
+    authorized = decode_jwt(session, username)
+    if authorized:
+        totp = pyotp.random_base32()
+        totp_uri = pyotp.totp.TOTP(totp).provisioning_uri(name=username, issuer_name="0xNotes")
+        try:
+            with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE users SET totp=%s WHERE username=%s", (totp, username))
+                    return (jsonify({'success': True, 'totp': totp, 'totp_uri': totp_uri}))
+        except:
+            return(jsonify({'success': False, 'error': 'Something went wrong'}))
+    else:
+        return(jsonify({'success': False, 'error': 'Invalid session token'}))
+
+@app.route('/api/v1/user/totp/disable', methods=['GET'])
+def disable_totp():
+    auth = request.headers.get('Authorization')
+    username = request.args.get('username')
+    if not auth or not username:
+        return(jsonify({'success': False, 'error': 'Missing session token or username'}))
+
+    session = auth.split("Bearer ")[1]
+    authorized = decode_jwt(session, username)
+    if authorized:
+        try:
+            with psycopg.connect(os.environ.get("POSTGRES_URL")) as conn:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE users SET totp=NULL WHERE username=%s", (username,))
+                    return (jsonify({'success': True}))
+        except:
+            return(jsonify({'success': False, 'error': 'Something went wrong'}))
+    else:
+        return(jsonify({'success': False, 'error': 'Invalid session token'}))
 
 if __name__ == '__main__':
     app.run()
