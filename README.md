@@ -1,34 +1,48 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 0xNotes Monorepo
 
-## Getting Started
+0xNotes is a free and open-source, privacy-focused, end-to-end encrypted note-taking web app built with Next.js and Python.
 
-First, run the development server:
+![2021-09-02_07-37](https://user-images.githubusercontent.com/40331046/131763217-6856e0a5-caa3-4a93-8ca3-563168c97a7e.png)
 
-```bash
-npm run dev
-# or
-yarn dev
+
+## Features
+
+- Formatted text support: __Bold__, _italic_, underline, add images, embed youtube, and more...
+- End-to-end encryption: Each note is encrypted locally with AES-CTR-256, currently one of the most secure encryption. The encryption key is derived from your username and password and stored locally on your browser. This means, hackers need to try 2^256 combinations to read your notes.
+- Two-factor authentication: Secure your account by enabling Google Authenticator. You will be required to enter a 6-digit code every time you log in.
+
+## Deploy
+
+This tutorial is only for advanced users that want to self host 0xNotes. You'll need a web host that supports Next.js and a server that can run docker. HTTPS connection is highly recommended, but the frontend __MUST USE HTTPS__.
+
+### Backend
+1. Clone and switch to the `server` branch of this repo.
+2. Create a docker image by using `docker build -t 0xnotes:latest .`.
+3. Create a `docker-compose.yml` file using the following template, add configuration for reverse proxy (NGINX or Traefik) if required.
+```yaml
+version: "3.3"
+
+services:
+  notes:
+    image: 0xnotes
+    restart: always
+    container_name: 0xnotes
+    ports:
+      - "5000:5000"
+    networks:
+      - web
+    environment:
+      - "POSTGRES_URL={POSTGRES_URL}"
+      - "SERVER_SECRET={SECRET_RANDOM_STRING}"
+      - "SERVER_SALT={SECRET_RANDOM_STRING}"
+
+networks:
+  web:
+    external: true
 ```
+5. Run the docker image using `docker-compose up -d`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Frontend
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Deploy the `main` branch of this repo to Vercel, Netlify, or Cloudflare Pages. 
+2. Create an environment variable `NEXT_PUBLIC_0XNOTES_HOST={API_HOST}`, where `API_HOST` is the URL of your API server. Example: `NEXT_PUBLIC_0XNOTES_HOST=https://0xnotesapi.brianthe.dev/`.
