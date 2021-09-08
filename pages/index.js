@@ -34,7 +34,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col flex-1 my-auto">
             <h1 className="py-4 font-normal 2xl:text-8xl xl:text-6xl md:text-5xl text-4xl text-center sm:text-left">0xNotes is an <b>end-to-end encrypted</b> note-taking app</h1>
-            <p className="py-4 text-center sm:text-left md:text-xl">We revolutionize digital note-taking by creating 0xNotes (/nɔt ɛks nəʊts/), one of the first note-taking app to feature <b>end-to-end encryption</b>, <b>protects user privacy</b>, and it's completely <b>open-source</b>! Every note is encrypted with a military-grade encryption (AES-CTR-256).</p>
+            <p className="py-4 text-center sm:text-left md:text-xl">We revolutionize digital note-taking by creating 0xNotes (/nɔt ɛks nəʊts/), one of the first note-taking app to feature <b>end-to-end encryption</b>, <b>protects user privacy</b>, and it&apos;s completely <b>open-source</b>! Every note is encrypted with a military-grade encryption (AES-CTR-256).</p>
             <div className="flex flex-row mx-auto sm:mx-0">
               <Link className="flex-1" href="/login">
                 <button style={{ display: isLoggedIn ? 'none' : 'block' }} className="accent my-auto mx-1 p-2 px-6 rounded-md">Login</button>
