@@ -42,7 +42,7 @@ export default function Home() {
 
       <main className="xl:p-14 md:p-10 p-4">
         <div className="flex sm:flex-row-reverse flex-col">
-          <div className="block flex-1 mx-auto sm:w-2/4 w-7/12">
+          <div className="block flex-1 m-auto sm:w-2/4 w-7/12">
             <Image src="/desk.png" width="100%" height="100%" layout="responsive" />
           </div>
           <div className="flex flex-col flex-1 my-auto">
