@@ -20,7 +20,6 @@ export default function Home() {
   return (
     <div className="text-white">
       <Head>
-        <title>0xNotes</title>
         <title>0xNotes | End-to-end Encrypted Note-taking App</title>
         <meta name="title" content="0xNotes | End-to-end Encrypted Note-taking App" />
         <meta name="description" content="0xNotes is an open-source note-taking app that features end-to-end encryption and user privacy protection." />

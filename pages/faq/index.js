@@ -6,7 +6,7 @@ export default function faq() {
     return (
         <div>
             <Head>
-                <title>FAQ | 0xNotes</title>
+                <title>Frequently Asked Questions | 0xNotes</title>
             </Head>
 
             <Navbar/>

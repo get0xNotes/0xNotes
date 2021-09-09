@@ -137,7 +137,7 @@ export default function Signup() {
     return (
         <div className="flex flex-col background absolute inset-0 text-white">
             <Head>
-                <title>Sign Up | 0xNotes</title>
+                <title>Create an Account | 0xNotes</title>
             </Head>
             <div>
 
