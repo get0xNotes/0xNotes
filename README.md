@@ -15,6 +15,33 @@
 
 This tutorial is only for advanced users that want to self host 0xNotes. You'll need a web host that supports Next.js and a server that can run docker. HTTPS connection is highly recommended, but the frontend __MUST USE HTTPS__.
 
+### Database
+1. Create a PostgreSQL database.
+2. Manually create tables:
+
+```sql
+CREATE TABLE notes (
+    id bigserial primary key not null,
+    author text,
+    modified timestamp with time zone not null default now(),
+    note text,
+    notes_nonce text,
+    server_nonce text,
+    title text,
+    title_nonce text,
+    type text
+);
+```
+
+```sql
+CREATE TABLE users (
+    id bigserial primary key not null,
+    username text,
+    auth text,
+    totp text
+);
+```
+
 ### Backend
 1. Clone and switch to the `server` branch of this repo.
 2. Create a docker image by using `docker build -t 0xnotes:latest .`.
