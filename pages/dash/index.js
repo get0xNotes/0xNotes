@@ -325,7 +325,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className="flex flex-wrap -mx-2 overflow-hidden">
-                    {notesInfo.map(note => (<div key={note.id} style={{ display: note.visible ? "block" : "none" }} className="my-2 px-2 w-full overflow-hidden sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 cursor-pointer" onClick={(e) => { editNote(note.id, note.title) }}><div className="h-full break-words bg-gray-600 rounded-md p-3"><h3 className="text-lg">{note.title}</h3><span className="font-thin">{moment.unix(note.date).tz(moment.tz.guess()).format("llll z")}</span></div></div>))}
+                    {notesInfo.map(note => (<div key={note.id} style={{ display: note.visible ? "block" : "none" }} className="transform hover:scale-105 my-2 px-2 w-full overflow-hidden sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 cursor-pointer" onClick={(e) => { editNote(note.id, note.title) }}><div className="h-full break-words bg-gray-600 rounded-md p-3"><h3 className="text-lg">{note.title}</h3><span className="font-thin">{moment.unix(note.date).tz(moment.tz.guess()).format("llll z")}</span></div></div>))}
                 </div>
             </div>
             {showModal ?
