@@ -4,9 +4,11 @@ import Link from 'next/link'
 
 export default function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [username, setUsername] = useState('Account')
 
     useEffect(() => {
         if (localStorage.getItem("ENCRYPTION_KEY") && localStorage.getItem("SESSION_TOKEN") && localStorage.getItem("USERNAME")) {
+            setUsername(localStorage.getItem("USERNAME"))
             setIsLoggedIn(true)
         } else {
             setIsLoggedIn(false)
@@ -32,6 +34,9 @@ export default function Navbar() {
             <div style={{ display: isLoggedIn ? 'block' : 'none' }} className="ml-auto">
                 <Link href="/dash">
                     <button className="accent my-auto mx-1 px-2 py-1 rounded-md">Dashboard</button>
+                </Link>
+                <Link href="/account">
+                    <button className="accent my-auto mx-1 px-2 py-1 rounded-md">{username}</button>
                 </Link>
             </div>
         </header>
