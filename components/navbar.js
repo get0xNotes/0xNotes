@@ -8,7 +8,6 @@ export default function Navbar() {
 
     useEffect(() => {
         if (localStorage.getItem("ENCRYPTION_KEY") && localStorage.getItem("SESSION_TOKEN") && localStorage.getItem("USERNAME")) {
-            setUsername(localStorage.getItem("USERNAME"))
             setIsLoggedIn(true)
         } else {
             setIsLoggedIn(false)
@@ -33,10 +32,10 @@ export default function Navbar() {
             </div>
             <div style={{ display: isLoggedIn ? 'block' : 'none' }} className="ml-auto">
                 <Link href="/dash">
-                    <button className="accent my-auto mx-1 px-2 py-1 rounded-md">Dashboard</button>
+                    <button className="mx-1 px-2 hover:text-blue-600">Dashboard</button>
                 </Link>
                 <Link href="/account">
-                    <button className="accent my-auto mx-1 px-2 py-1 rounded-md">{username}</button>
+                    <button className="mx-1 px-2 py-1 hover:text-blue-600">Account</button>
                 </Link>
             </div>
         </header>
