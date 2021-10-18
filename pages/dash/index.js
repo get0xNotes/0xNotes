@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useRef, useState, useEffect } from 'react'
 import Navbar from '../../components/navbar'
+import { useRouter } from 'next/router'
 const pako = require('pako');
 const axios = require('axios');
 const moment = require('moment-timezone');
@@ -13,7 +14,8 @@ export default function Dashboard() {
     const [noteId, setNoteId] = useState(0)
 
     const [search, setSearch] = useState("")
-    const [sort, setSort] = useState("newest")
+
+    const router = useRouter()
 
     const editorRef = useRef()
     const [editorLoaded, setEditorLoaded] = useState(false)
@@ -137,6 +139,15 @@ export default function Dashboard() {
         }
     }
 
+    async function logout() {
+        if (process.browser) {
+            localStorage.removeItem("SESSION_TOKEN")
+            localStorage.removeItem("ENCRYPTION_TOKEN")
+            localStorage.removeItem("NOTES_CACHE")
+            router.push("/login")
+        }
+    }
+
     async function loadNotes() {
         var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/list?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
         if (response.data.success) {
@@ -156,10 +167,7 @@ export default function Dashboard() {
         } else {
             if (response.data.error == "Invalid session token") {
                 alert("Session expired, please login again.")
-                localStorage.removeItem("SESSION_TOKEN")
-                localStorage.removeItem("ENCRYPTION_TOKEN")
-                localStorage.removeItem("NOTES_CACHE")
-                router.push("/login")
+                logout()
             }
         }
     }
@@ -272,7 +280,6 @@ export default function Dashboard() {
     }
 
     function sortNotes(sort) {
-        setSort(sort)
         var ni = notesInfo
         if (sort == "newest") {
             ni.sort((a, b) => {
@@ -315,8 +322,8 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row mb-2">
                     <input className="flex-1 rounded-md p-2 bg-gray-700 mb-4 md:mb-0 mr-0 md:mr-4" placeholder="Search" onChange={(e) => { searchNotes(e.target.value) }} value={search}></input>
                     <div className="flex-1 flex flex-row">
-                        <select id="sort" className="flex-1 bg-gray-700 p-2 rounded-md mr-2" onChange={(e) => {sortNotes(e.target.value)}}>
-                            <option selected disabled hidden>Sort</option>
+                        <select defaultValue="sort" id="sort" className="flex-1 bg-gray-700 p-2 rounded-md mr-2" onChange={(e) => { sortNotes(e.target.value) }}>
+                            <option value="sort" disabled hidden>Sort</option>
                             <option value="newest">Newest</option>
                             <option value="oldest">Oldest</option>
                             <option value="alphabetical">Alphabetical</option>
