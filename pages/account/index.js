@@ -81,6 +81,15 @@ export default function Account() {
         setCacheSize(0)
     }
 
+    async function logout() {
+        if (process.browser) {
+            localStorage.removeItem("SESSION_TOKEN")
+            localStorage.removeItem("ENCRYPTION_TOKEN")
+            localStorage.removeItem("NOTES_CACHE")
+            router.push("/login")
+        }
+    }
+
     useEffect(() => {
         if (localStorage.getItem("SESSION_TOKEN")) {
             setUser(localStorage.getItem("USERNAME"))
@@ -110,7 +119,7 @@ export default function Account() {
                 <label>Encryption key (hex):</label>
                 <input type="text" className="p-2 rounded-md mb-1 bg-gray-700" value={encryptionKey} disabled></input>
                 <h2 className="font-bold text-3xl my-2">Authentication</h2>
-                <h3 className="font-bold text-2xl my-2">Two-factor Authentication</h3>
+                <h3 className="font-bold text-2xl my-2">Two-factor Authentication (Experimental)</h3>
                 <p className="mb-2">{"Enabling two-factor authentication prevents phishing and improves your account security. If enabled, you'll need to input a 6-digit code every time you log in. Please back up the secret key in a hidden place (preferably offline). We won't be able to recover your account if you lost your secret key."}</p>
                 {TOTP ? <div className="bg-gray-600 rounded-md flex flex-col p-2">
                     <p className="font-bold text-xl mx-auto mb-2">Two-factor authentication is <span className="text-green-400">enabled</span></p>
@@ -128,6 +137,7 @@ export default function Account() {
                 <label>Session token (parsed):</label>
                 <input type="text" className="p-2 rounded-md mb-1 bg-gray-700" value={parsedSession} disabled></input>
                 <p>You will be logged out automatically on {moment.unix(sessionExpiration).tz(moment.tz.guess()).format("llll z")}.</p>
+                <button className="p-2 my-2 mr-auto rounded-md accent hover:bg-blue-600 text-white" onClick={(e) => { logout() }}>Log out now</button>
                 <h2 className="font-bold text-3xl my-2">Cache</h2>
                 <p>We store some information about your notes (id, title, date modified) locally on your browser. This cache will be used before 0xNotes loads new info from the server. You can purge this cache, but it will be filled again when you open the dashboard.</p>
                 <button className="p-2 my-2 mr-auto rounded-md accent hover:bg-blue-600 text-white" onClick={(e) => { clearCache() }}>Purge cache (~{cacheSize} bytes)</button>
