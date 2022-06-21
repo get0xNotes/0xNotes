@@ -132,7 +132,7 @@ export default function Signup() {
         if (localStorage.getItem("SESSION_TOKEN")) {
             router.push("/dash")
         }
-    }, [])
+    }, [router])
 
     return (
         <div className="flex flex-col background absolute inset-0 text-white">

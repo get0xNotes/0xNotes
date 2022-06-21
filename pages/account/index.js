@@ -102,7 +102,7 @@ export default function Account() {
         } else {
             router.push("/login")
         }
-    }, [])
+    }, [router])
 
     return (
         <div>

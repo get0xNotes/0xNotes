@@ -26,15 +26,15 @@ export default function Navbar() {
                 <Link href="/login">
                     <a className="mx-1">Login</a>
                 </Link>
-                <Link href="/signup">
+                <Link href="/signup" passHref>
                     <button className="accent my-auto mx-1 px-2 py-1 rounded-md">Sign Up</button>
                 </Link>
             </div>
             <div style={{ display: isLoggedIn ? 'block' : 'none' }} className="ml-auto">
-                <Link href="/dash">
+                <Link href="/dash" passHref>
                     <button className="mx-1 px-2 hover:text-blue-600">Dashboard</button>
                 </Link>
-                <Link href="/account">
+                <Link href="/account" passHref>
                     <button className="mx-1 px-2 py-1 hover:text-blue-600">Account</button>
                 </Link>
             </div>

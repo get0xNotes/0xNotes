@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import Navbar from '../../components/navbar'
 import { useRouter } from 'next/router'
 const pako = require('pako');
@@ -94,8 +94,8 @@ export default function Dashboard() {
     }
 
     // Decrypt and inflate base64 + nonce into string
-    async function decryptAndUncompressNote(encrypted, nonce) {
-        if (process.browser) {
+    const decryptAndUncompressNote = useCallback(async (encrypted, nonce) => {
+        if (typeof window !== 'undefined') {
             var ec_bytes = base64ToByte(encrypted)
             var key_buf = hexStringToByte(localStorage.getItem('ENCRYPTION_KEY'))
             var counter = hexStringToByte(nonce + "0000000000000000")
@@ -112,11 +112,11 @@ export default function Dashboard() {
             var text = new TextDecoder("utf-8").decode(pako.inflate(decrypted))
             return text;
         }
-    }
+    }, [])
 
     // Encrypt and deflate string into [base64. nonce]
     async function encryptAndCompressNote(text) {
-        if (process.browser) {
+        if (typeof window !== 'undefined') {
             var compressed = pako.gzip(text)
             var key_buf = hexStringToByte(localStorage.getItem('ENCRYPTION_KEY'))
             var nonce = new Uint8Array(8)
@@ -139,16 +139,16 @@ export default function Dashboard() {
         }
     }
 
-    async function logout() {
-        if (process.browser) {
+    const logout = useCallback(async () => {
+        if (typeof window !== 'undefined') {
             localStorage.removeItem("SESSION_TOKEN")
             localStorage.removeItem("ENCRYPTION_TOKEN")
             localStorage.removeItem("NOTES_CACHE")
             router.push("/login")
         }
-    }
+    }, [router])
 
-    async function loadNotes() {
+    const loadNotes = useCallback(async () => {
         var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/list?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
         if (response.data.success) {
             var noteList = []
@@ -170,10 +170,10 @@ export default function Dashboard() {
                 logout()
             }
         }
-    }
+    }, [decryptAndUncompressNote, logout])
 
     async function createNote() {
-        if (process.browser) {
+        if (typeof window !== 'undefined') {
             // Ask the user for a title
             var title = window.prompt("Enter the title of the note:", "Untitled Note")
             if (title) {
@@ -195,7 +195,7 @@ export default function Dashboard() {
     async function getNote(id) {
         // Show a loading text when the note is loading
         setNoteText("<h2>Loading Note...</h2>")
-        if (process.browser) {
+        if (typeof window !== 'undefined') {
             try {
                 var response = await axios.get(process.env.NEXT_PUBLIC_0XNOTES_HOST + "/api/v1/notes/" + id + "?username=" + localStorage.getItem("USERNAME"), { headers: { "Authorization": "Bearer " + localStorage.getItem("SESSION_TOKEN") } })
                 if (response.data.success) {
@@ -225,7 +225,7 @@ export default function Dashboard() {
     }
 
     async function updateNote(title, note) {
-        if (process.browser) {
+        if (typeof window !== 'undefined') {
             var [title_encrypted, title_nonce] = await encryptAndCompressNote(title ? title : "Untitled Note")
             var [note_encrypted, note_nonce] = await encryptAndCompressNote(note)
             var data = { "username": localStorage.getItem("USERNAME"), "type": "text_aes", "notes": note_encrypted, "notes_nonce": note_nonce, "title": title_encrypted, "title_nonce": title_nonce }
@@ -270,31 +270,33 @@ export default function Dashboard() {
         setSearch(keyword)
         var ni = notesInfo
         for (var i = 0; i < ni.length; i++) {
-            if (!ni[i].title.toLowerCase().includes(keyword.toLowerCase())) {
-                ni[i].visible = false
-            } else {
-                ni[i].visible = true
-            }
+            ni[i].visible = ni[i].title.toLowerCase().includes(keyword.toLowerCase())
         }
         setNotesInfo(ni)
     }
 
     function sortNotes(sort) {
         var ni = notesInfo
-        if (sort == "newest") {
-            ni.sort((a, b) => {
-                return b.date - a.date
-            })
-        } else if (sort == "oldest") {
-            ni.sort((a, b) => {
-                return a.date - b.date
-            })
-        } else if (sort == "alphabetical") {
-            ni.sort((a, b) => {
-                return a.title.toLowerCase().localeCompare(b.title.toLowerCase())
-            })
+        switch (sort) {
+            case "newest":
+                ni.sort((a, b) => {
+                    return new Date(b.date) - new Date(a.date)
+                })
+                break
+            case "oldest":
+                ni.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date)
+                })
+                break
+            case "alphabetical":
+                ni.sort((a, b) => {
+                    return a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+                })
+                break
         }
-        setNotesInfo(ni)
+        console.log(ni)
+        setNotesInfo([...ni])
+
     }
 
     useEffect(() => {
@@ -310,7 +312,7 @@ export default function Dashboard() {
 
         // Retrieve notes from server
         loadNotes()
-    }, [])
+    }, [loadNotes])
 
     return (
         <div className="text-white">
