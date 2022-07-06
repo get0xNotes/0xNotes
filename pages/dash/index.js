@@ -154,11 +154,21 @@ export default function Dashboard() {
             var noteList = []
             var notes = response.data.notes
             for (var i = 0; i < notes.length; i++) {
-                var id = notes[i].id
-                var title = await decryptAndUncompressNote(notes[i].title, notes[i].title_nonce)
+                if ("ID" in notes[i]) {
+                    // Support for Go server
+                    var id = notes[i].ID
+                    var title = await decryptAndUncompressNote(notes[i].Title, notes[i].TitleNonce)
 
-                // Format the time to user's timezone
-                noteList.push({ "id": id, "title": title, "date": notes[i].modified, "visible": true })
+                    // Format the time to user's timezone
+                    noteList.push({ "id": id, "title": title, "date": notes[i].Modified, "visible": true })
+                } else if ("id" in notes[i]) {
+                    // Support for Python server
+                    var id = notes[i].id
+                    var title = await decryptAndUncompressNote(notes[i].title, notes[i].title_nonce)
+
+                    // Format the time to user's timezone
+                    noteList.push({ "id": id, "title": title, "date": notes[i].modified, "visible": true })
+                }
             }
             setNotesInfo(noteList)
 
