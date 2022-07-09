@@ -37,7 +37,7 @@
 	/>
 	<meta property="twitter:image" content="" />
 	<link rel="icon" href="/favicon.ico" />
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="anonymous" />
 	<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" />
 </svelte:head>
@@ -46,7 +46,7 @@
 <main class="bg-primary xl:px-14 md:px-10 px-4">
 	<div class="flex sm:flex-row-reverse flex-col-reverse">
 		<div class="block flex-1 m-auto sm:w-2/4 w-7/12">
-			<img src="/desk.png" class="xl:p-20" alt="A desk with a PC." />
+			<img src="/desk.webp" class="xl:p-20" alt="A desk with a PC." />
 		</div>
 		<div class="flex flex-col flex-1 my-auto">
 			<h1

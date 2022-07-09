@@ -4,7 +4,7 @@
 			<div class="mt-8 sm:mb-8 sm:w-full sm:px-8 flex flex-col md:flex-row justify-between">
 				<div class="mx-auto flex-1">
 					<div class="w-24 flex flex-col">
-						<img src="/logo.png" class="mx-auto w-20 h-20" alt="0xNotes Logo" />
+						<img src="/logo.webp" class="mx-auto w-20 h-20" alt="0xNotes Logo" />
 						<span class="mx-auto text-xl font-bold">0xNotes</span>
 					</div>
 				</div>
