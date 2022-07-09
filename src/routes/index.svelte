@@ -37,6 +37,9 @@
 	/>
 	<meta property="twitter:image" content="" />
 	<link rel="icon" href="/favicon.ico" />
+	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+	<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" />
 </svelte:head>
 
 <NavBar />
@@ -75,7 +78,6 @@
 <Footer/>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
 	h1 {
 		font-family: 'Montserrat', sans-serif;
 	}
