@@ -11,7 +11,7 @@
 
 <header class="flex p-3 px-6 w-full text-white bg-primarylight">
 	<a class="my-auto flex" href="/">
-		<img src="/logo.webp" alt="0xNotes" class="h-7 w-7 m-auto" />
+		<img src="/logo.svg" alt="0xNotes" class="h-7 w-7 m-auto" />
 		<span class="my-auto text-xl font-bold mx-2">0xNotes</span>
 	</a>
 	<div style="display: {isLoggedIn ? 'none' : 'block'}" class="ml-auto">
