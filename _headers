@@ -1,0 +1,8 @@
+# When using Cloudflare Pages, this file should be moved to /.svelte-kit/cloudflare during build
+# TODO: Configure the CSP header to secure loading external fonts and resources (e.g. images)
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
