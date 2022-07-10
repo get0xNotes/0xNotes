@@ -38,15 +38,22 @@
 	<meta property="twitter:image" content="" />
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="anonymous" />
-	<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" />
+	<link
+		rel="preload"
+		as="style"
+		href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap"
+	/>
+	<link
+		rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap"
+	/>
 </svelte:head>
 
 <NavBar />
-<main class="bg-primary xl:px-14 md:px-10 px-4">
+<main class="bg-primary xl:px-14 md:px-10 px-4 pb-5">
 	<div class="flex sm:flex-row-reverse flex-col-reverse">
-		<div class="block flex-1 m-auto sm:w-2/4 w-7/12">
-			<img src="/desk.webp" class="xl:p-20" alt="A desk with a PC." />
+		<div class="flex flex-1">
+			<img src="/desk.webp" class="max-w-full h-auto ml-auto my-auto" alt="A desk with a PC." />
 		</div>
 		<div class="flex flex-col flex-1 my-auto">
 			<h1
@@ -75,9 +82,36 @@
 		</div>
 	</div>
 </main>
-<Footer/>
+<Footer />
 
 <style>
+	main {
+		background: linear-gradient(
+				135deg,
+				#0f2333 21px,
+				#d9ecff10 22px,
+				#d9ecff10 24px,
+				transparent 24px,
+				transparent 67px,
+				#d9ecff10 67px,
+				#d9ecff10 69px,
+				transparent 69px
+			),
+			linear-gradient(
+					225deg,
+					#0f2333 21px,
+					#d9ecff10 22px,
+					#d9ecff10 24px,
+					transparent 24px,
+					transparent 67px,
+					#d9ecff10 67px,
+					#d9ecff10 69px,
+					transparent 69px
+				)
+				0 64px;
+		background-color: #0f2333;
+		background-size: 64px 128px;
+	}
 	h1 {
 		font-family: 'Montserrat', sans-serif;
 	}
