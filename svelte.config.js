@@ -18,7 +18,6 @@ const config = {
 				'default-src': ['self'],
 				'style-src': ['self', 'unsafe-inline', 'fonts.googleapis.com'],
 				'font-src': ['self', 'fonts.gstatic.com'],
-				'script-src': ['self', 'ajax.cloudflare.com'],
 			}
 		}
 	}
