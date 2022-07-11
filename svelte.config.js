@@ -12,7 +12,14 @@ const config = {
 	],
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		csp: {
+			directives: {
+				'default-src': ['self'],
+				'style-src': ['self', 'fonts.googleapis.com'],
+				'font-src': ['self', 'fonts.gstatic.com'],
+			}
+		}
 	}
 };
 

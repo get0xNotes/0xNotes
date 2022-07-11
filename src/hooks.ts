@@ -8,7 +8,5 @@ export const handle: Handle = async ({event, resolve}) => {
     response.headers.set("X-Content-Type-Options", "nosniff");
     response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
 
-    // TODO: Configure the CSP header to secure loading external fonts and resources (e.g. images).
-
     return response;
 }

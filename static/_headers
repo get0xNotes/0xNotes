@@ -1,6 +1,5 @@
 # Set headers for Cloudflare Pages (and probably Netlify).
 # Only works with static files, see src/hooks.ts for other files.
-# TODO: Configure the CSP header to secure loading external fonts and resources (e.g. images).
 
 /*
   X-Frame-Options: DENY
