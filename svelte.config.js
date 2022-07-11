@@ -16,8 +16,9 @@ const config = {
 		csp: {
 			directives: {
 				'default-src': ['self'],
-				'style-src': ['self', 'fonts.googleapis.com'],
+				'style-src': ['self', 'unsafe-inline', 'fonts.googleapis.com'],
 				'font-src': ['self', 'fonts.gstatic.com'],
+				'script-src': ['self', 'ajax.cloudflare.com'],
 			}
 		}
 	}
