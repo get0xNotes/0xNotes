@@ -22,3 +22,31 @@ html {
 ::-webkit-scrollbar-thumb:hover {
 	background: rgb(0, 0, 0);
 }
+
+.background {
+	background: linear-gradient(
+			135deg,
+			#0f2333 21px,
+			#d9ecff10 22px,
+			#d9ecff10 24px,
+			transparent 24px,
+			transparent 67px,
+			#d9ecff10 67px,
+			#d9ecff10 69px,
+			transparent 69px
+		),
+		linear-gradient(
+				225deg,
+				#0f2333 21px,
+				#d9ecff10 22px,
+				#d9ecff10 24px,
+				transparent 24px,
+				transparent 67px,
+				#d9ecff10 67px,
+				#d9ecff10 69px,
+				transparent 69px
+			)
+			0 64px;
+	background-color: #0f2333;
+	background-size: 64px 128px;
+}

@@ -1,5 +1,7 @@
-<script>
+<script lang="ts">
 	import { browser } from '$app/env';
+
+	export var addClass: String = "";
 
 	var isLoggedIn = false;
 	if (browser) {
@@ -9,7 +11,7 @@
 	}
 </script>
 
-<header class="flex p-3 px-6 w-full text-white bg-primarylight">
+<header class="{addClass} flex p-3 px-6 w-full text-white bg-primarylight">
 	<a class="my-auto flex" href="/">
 		<img src="/logo.svg" alt="0xNotes" class="h-7 w-7 m-auto" />
 		<span class="my-auto text-xl font-bold mx-2">0xNotes</span>

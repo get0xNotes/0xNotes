@@ -50,8 +50,8 @@
 </svelte:head>
 
 <NavBar />
-<main class="bg-primary xl:px-14 md:px-10 px-4 pb-5">
-	<div class="flex sm:flex-row-reverse flex-col-reverse">
+<main class="background min-h-screen flex xl:px-14 md:px-10 px-4 pb-5">
+	<div class="my-auto flex sm:flex-row-reverse flex-col-reverse">
 		<div class="flex flex-1">
 			<img src="/desk.webp" class="max-w-full h-auto ml-auto my-auto" alt="A desk with a PC." />
 		</div>
@@ -85,33 +85,6 @@
 <Footer />
 
 <style>
-	main {
-		background: linear-gradient(
-				135deg,
-				#0f2333 21px,
-				#d9ecff10 22px,
-				#d9ecff10 24px,
-				transparent 24px,
-				transparent 67px,
-				#d9ecff10 67px,
-				#d9ecff10 69px,
-				transparent 69px
-			),
-			linear-gradient(
-					225deg,
-					#0f2333 21px,
-					#d9ecff10 22px,
-					#d9ecff10 24px,
-					transparent 24px,
-					transparent 67px,
-					#d9ecff10 67px,
-					#d9ecff10 69px,
-					transparent 69px
-				)
-				0 64px;
-		background-color: #0f2333;
-		background-size: 64px 128px;
-	}
 	h1 {
 		font-family: 'Montserrat', sans-serif;
 	}
