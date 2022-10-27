@@ -15,13 +15,8 @@
 			uColor = "#ef4444"
 		} else {
 			fetch('/api/user/' + username + '/available').then(res => res.json()).then(data => {
-				if (data.available) {
-					uMessage = "Username " + username + " is available."
-					uColor = "#10b981"
-				} else {
-					uMessage = "Username " + username + " is taken."
-					uColor = "#ef4444"
-				}
+				uMessage = data.reason
+				uColor = data.available ? "#10b981" : "#ef4444"
 			})
 		}
 	}
