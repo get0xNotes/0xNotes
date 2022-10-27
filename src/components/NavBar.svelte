@@ -15,6 +15,7 @@
 	<a class="my-auto flex" href="/">
 		<img src="/logo.svg" alt="0xNotes" class="h-7 w-7 m-auto" />
 		<span class="my-auto text-xl font-bold mx-2">0xNotes</span>
+		<span class="bg-yellow-500 text-black rounded-full px-2">dev-unstable</span>
 	</a>
 	<div style="display: {isLoggedIn ? 'none' : 'block'}" class="ml-auto">
 		<a href="/login">
