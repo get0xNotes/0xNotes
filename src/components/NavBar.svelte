@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { browser } from '$app/env';
+	import { user, session, sk } from '../routes/stores';
+	import { get } from 'svelte/store';
 
 	export var addClass: String = "";
 
-	var isLoggedIn = false;
-	if (browser) {
-		if (localStorage.getItem('SESSION_TOKEN')) {
-			isLoggedIn = true;
-		}
+	var isLoggedIn = false
+	$: if (get(user) && get(session) && get(sk)) {
+		isLoggedIn = true
 	}
 </script>
 

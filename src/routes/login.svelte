@@ -1,6 +1,15 @@
 <script>
 	import NavBar from '../components/NavBar.svelte';
 	import Footer from '../components/Footer.svelte';
+	import { page } from '$app/stores'
+	import { user, session, sk } from './stores'
+	import { get } from 'svelte/store';
+
+	var username = $page.url.searchParams.get('prefill');
+	
+	$: if (get(user) && get(session) && get(sk)) {
+		window.location.href = "/dash"
+	}
 </script>
 
 <svelte:head>
@@ -20,6 +29,7 @@
 				type="text"
 				class="mx-auto w-full p-2 rounded-md border-4 border-primarylight text-black"
 				placeholder="Username"
+				bind:value={username}
 			/>
 			<label for="password" class="mx-1">Password</label>
 			<input

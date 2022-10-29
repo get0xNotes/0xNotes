@@ -17,6 +17,7 @@
     "@sveltejs/adapter-auto": "next",
     "@sveltejs/adapter-node": "^1.0.0-next.77",
     "@sveltejs/kit": "next",
+    "@types/crypto-js": "^4.1.1",
     "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
@@ -39,7 +40,10 @@
   },
   "type": "module",
   "dependencies": {
+    "@stablelib/x25519": "^1.0.3",
+    "crypto-js": "^4.1.1",
     "jose": "^4.8.3",
+    "svelte-local-storage-store": "^0.3.1",
     "zxcvbn": "^4.4.2"
   }
 }

@@ -2,11 +2,18 @@
 	import NavBar from '../components/NavBar.svelte'
 	import Footer from '../components/Footer.svelte'
 	import zxcvbn from 'zxcvbn'
+	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
+	import { generateKeyPair } from '@stablelib/x25519'
+	import { user, session, sk } from './stores'
+	import { get } from 'svelte/store';
+	
 	var username = ""
 	var password = ""
 	var confirm = ""
+	var uAvailable = false
 	var uMessage = ""
 	var uColor = ""
+	var allowSubmit = false
 
 	$: if (username) {
 		username = username.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase()
@@ -15,14 +22,66 @@
 			uColor = "#ef4444"
 		} else {
 			fetch('/api/user/' + username + '/available').then(res => res.json()).then(data => {
+				uAvailable = data.available
 				uMessage = data.reason
 				uColor = data.available ? "#10b981" : "#ef4444"
 			})
 		}
 	}
 
-	function signup() {
-		
+	$: if (uAvailable && password == confirm && zxcvbn(password).score == 4) {
+		allowSubmit = true
+	} else {
+		allowSubmit = false
+	}
+
+	$: if (get(user) && get(session) && get(sk)) {
+		window.location.href = "/dash"
+	}
+
+	function toHexString(byteArray: Uint8Array) {
+		var s = ""
+		byteArray.forEach(function(byte) {
+			s += ('0' + (byte & 0xFF).toString(16)).slice(-2)
+		})
+		return s
+	}
+
+	async function signup() {
+		if (allowSubmit) {
+			// Clear confirm password
+			confirm = ""
+			
+			// Generate master key, auth key, and ECDH keypair
+			var masterKey = PBKDF2(password, username + "0xNotes", { keySize: 256 / 32, iterations: 100000 })
+			var authKey = enc.Hex.stringify(SHA256(masterKey))
+			var ecdhPair = generateKeyPair()
+
+			// POST to API
+			var res = await fetch('/api/signup', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					username: username,
+					auth: authKey,
+					pk: toHexString(ecdhPair.publicKey),
+					sk: enc.Hex.stringify(enc.Base64.parse(AES.encrypt(toHexString(ecdhPair.secretKey), "masterKey").toString())),
+				})
+			})
+			var data = await res.json()
+			if (data.success) {
+				user.set(username)
+				session.set(data.session)
+				sk.set(toHexString(ecdhPair.secretKey))
+				window.location.href = "/dash"
+			} else {
+				alert("An error occurred while signing up.")
+			}
+		} else {
+			alert("Please make sure your username is available, your passwords match, and your password is strong.")
+		}
 	}
 </script>
 
@@ -55,10 +114,12 @@
 				bind:value={password}
 			/>
 			<div class="flex flex-col p-1">
-				<div class="h-1 w-auto bg-red-500 {zxcvbn(password).score <= 2 ? "visible" : "hidden"}"></div>
-				<div class="h-1 w-auto bg-yellow-500 {zxcvbn(password).score == 3 ? "visible" : "hidden"}"></div>
-				<div class="h-1 w-auto bg-green-500 {zxcvbn(password).score == 4 ? "visible" : "hidden"}"></div>
-				<span class="text-red-500">{password ? zxcvbn(password).feedback.suggestions : ""}</span>
+				<div class="h-1 w-auto bg-red-500 {zxcvbn(password).score <= 2 ? 'visible' : 'hidden'}" />
+				<div
+					class="h-1 w-auto bg-yellow-500 {zxcvbn(password).score == 3 ? 'visible' : 'hidden'}"
+				/>
+				<div class="h-1 w-auto bg-green-500 {zxcvbn(password).score == 4 ? 'visible' : 'hidden'}" />
+				<span class="text-red-500">{password ? zxcvbn(password).feedback.suggestions : ''}</span>
 			</div>
 			<label for="2fa" class="mx-1">Confirm Password</label>
 			<input
@@ -68,9 +129,9 @@
 				placeholder="Confirm Password"
 				bind:value={confirm}
 			/>
-			<span class="px-1 text-red-500">{password != confirm ? "Passwords do not match." : ""}</span>
+			<span class="px-1 text-red-500">{password != confirm ? 'Passwords do not match.' : ''}</span>
 		</div>
-		<button class="bg-accent mt-1 mx-1 p-2 rounded-md" on:click={signup}>Sign Up</button>
+		<button class="bg-accent mt-1 mx-1 p-2 rounded-md disabled:bg-sky-800" on:click={signup} disabled={!allowSubmit}>Sign Up</button>
 		<div class="mx-auto mt-5">
 			<span>Already registered? </span>
 			<a href="/login" class="underline">Login here.</a>
