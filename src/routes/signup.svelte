@@ -6,6 +6,7 @@
 	import { generateKeyPair } from '@stablelib/x25519'
 	import { user, session, sk } from './stores'
 	import { get } from 'svelte/store';
+	import { bufferToWords, toHexString } from '../utils/encoding'
 	
 	var username = ""
 	var password = ""
@@ -39,21 +40,13 @@
 		window.location.href = "/dash"
 	}
 
-	function toHexString(byteArray: Uint8Array) {
-		var s = ""
-		byteArray.forEach(function(byte) {
-			s += ('0' + (byte & 0xFF).toString(16)).slice(-2)
-		})
-		return s
-	}
-
 	async function signup() {
 		if (allowSubmit) {
 			// Clear confirm password
 			confirm = ""
 			
 			// Generate master key, auth key, and ECDH keypair
-			var masterKey = PBKDF2(password, username + "0xNotes", { keySize: 256 / 32, iterations: 100000 })
+			var masterKey = PBKDF2(password, username + "0xNotes", { keySize: 256 / 32, iterations: 100000 }).toString()
 			var authKey = enc.Hex.stringify(SHA256(masterKey))
 			var ecdhPair = generateKeyPair()
 
@@ -67,7 +60,7 @@
 					username: username,
 					auth: authKey,
 					pk: toHexString(ecdhPair.publicKey),
-					sk: enc.Hex.stringify(enc.Base64.parse(AES.encrypt(toHexString(ecdhPair.secretKey), "masterKey").toString())),
+					sk: enc.Hex.stringify(enc.Base64.parse(AES.encrypt(bufferToWords(ecdhPair.secretKey), masterKey).toString())),
 				})
 			})
 			var data = await res.json()

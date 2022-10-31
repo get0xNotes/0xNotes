@@ -1,14 +1,48 @@
 <script>
 	import NavBar from '../components/NavBar.svelte';
 	import Footer from '../components/Footer.svelte';
-	import { page } from '$app/stores'
+	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
 	import { user, session, sk } from './stores'
 	import { get } from 'svelte/store';
 
-	var username = $page.url.searchParams.get('prefill');
+	var username = get(user);
+	var password = "";
+	var totpcode = "";
 	
 	$: if (get(user) && get(session) && get(sk)) {
 		window.location.href = "/dash"
+	}
+
+	async function login() {
+		var masterKey = PBKDF2(password, username + "0xNotes", { keySize: 256 / 32, iterations: 100000 }).toString()
+		var authKey = enc.Hex.stringify(SHA256(masterKey))
+
+		// TODO: TOTP and long-term session
+
+		var res =  await fetch('/api/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: username,
+				auth: authKey
+			})
+		})
+		var data = await res.json()
+		if (data.success) {
+			session.set(data.session)
+			user.set(data.username)
+
+			// Decrypt SK
+			var secretKey = AES.decrypt(enc.Base64.stringify(enc.Hex.parse(data.sk)), masterKey)
+			sk.set(enc.Hex.stringify(secretKey))
+
+			// Redirect to dashboard
+			window.location.href = "/dash"
+		} else {
+			alert(data.reason)
+		}
 	}
 </script>
 
@@ -37,6 +71,7 @@
 				type="password"
 				class="mx-auto w-full p-2 rounded-md border-4 border-primarylight text-black"
 				placeholder="Password"
+				bind:value={password}
 			/>
 			<label for="2fa" class="mx-1">2FA (if enabled)</label>
 			<input
@@ -44,13 +79,14 @@
 				type="text"
 				class="mx-auto w-full p-2 rounded-md border-4 border-primarylight text-black"
 				placeholder="2FA code"
+				bind:value={totpcode}
 			/>
 			<div class="mx-1 mt-1">
 				<input id="longsession" type="checkbox" />
 				<label for="longsession" class="ml-1">Keep me logged in for a week!</label>
 			</div>
 		</div>
-		<button class="bg-accent mt-1 mx-1 p-2 rounded-md">Login</button>
+		<button class="bg-accent mt-1 mx-1 p-2 rounded-md" on:click={login}>Login</button>
 		<div class="mx-auto mt-5">
 			<span>New user? </span>
 			<a href="/signup" class="underline">Create an account.</a>
