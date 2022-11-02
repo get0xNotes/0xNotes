@@ -9,6 +9,7 @@ export function toHexString(byteArray: Uint8Array) {
 }
 
 export function toUint8Array(wordArray: CryptoJS.lib.WordArray) {
+    var sigBytes = wordArray.sigBytes
     var len = wordArray.words.length,
         u8_array = new Uint8Array(len << 2),
         offset = 0, word, i
@@ -20,7 +21,7 @@ export function toUint8Array(wordArray: CryptoJS.lib.WordArray) {
         u8_array[offset++] = (word >> 8) & 0xff;
         u8_array[offset++] = word & 0xff;
     }
-    return u8_array;
+    return u8_array.slice(0, sigBytes);
 }
 
 
