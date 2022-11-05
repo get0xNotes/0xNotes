@@ -7,15 +7,13 @@
 	import { Buffer } from 'buffer';
 	import { user, session, sk, notes } from './stores';
 	import { get } from 'svelte/store';
-	import cryptojs from 'crypto-js';
+	import CryptoJS from 'crypto-js';
 	import { sharedKey } from '@stablelib/x25519';
 	import { bufferToWords, toHexString, toUint8Array } from '../lib/encoding';
 	import { browser } from '$app/env';
 	import { faUser, faCalendar } from '@fortawesome/free-solid-svg-icons';
 	import { socket } from '../lib/socket';
 	import { onMount } from 'svelte';
-
-	const { lib, enc, SHA256, AES } = cryptojs;
 
 	var search = '';
 	var sortby = 'newest';
@@ -43,16 +41,16 @@
 			// Decrypt all titles
 			for (var i = 0; i < data.notes.length; i++) {
 				var note = data.notes[i];
-				var authorSK = toUint8Array(enc.Hex.parse(get(sk)));
-				var modifierPK = toUint8Array(enc.Hex.parse(await getPK(note.modifiedBy)));
+				var authorSK = toUint8Array(CryptoJS.enc.Hex.parse(get(sk)));
+				var modifierPK = toUint8Array(CryptoJS.enc.Hex.parse(await getPK(note.modifiedBy)));
 				var shared = sharedKey(authorSK, modifierPK);
-				var key = SHA256(bufferToWords(shared)).toString();
+				var key = CryptoJS.SHA256(bufferToWords(shared)).toString();
 
 				// Decrypt EK
-				var ek = AES.decrypt(note.keys[get(user)], key).toString();
+				var ek = CryptoJS.AES.decrypt(note.keys[get(user)], key).toString();
 
 				// Decrypt title
-				var title = AES.decrypt(note.title, ek).toString(enc.Utf8);
+				var title = CryptoJS.AES.decrypt(note.title, ek).toString(CryptoJS.enc.Utf8);
 
 				// Update note
 				data.notes[i].title = title;
@@ -119,43 +117,43 @@
 
 	async function encrypt(title: string, content: string, contributors: string[]) {
 		var me = get(user);
-		var mySK = toUint8Array(enc.Hex.parse(get(sk)));
+		var mySK = toUint8Array(CryptoJS.enc.Hex.parse(get(sk)));
 
 		// Generate random EK
-		var EK = lib.WordArray.random(256 / 8);
+		var EK = CryptoJS.lib.WordArray.random(256 / 8);
 
 		// for each contributor, generate a shared secret and encrypt EK with it
 		var keys: { [x: string]: string } = {};
 		for (var i = 0; i < contributors.length; i++) {
 			var contributor = contributors[i];
-			var contributorPK = toUint8Array(enc.Hex.parse(await getPK(contributor)));
+			var contributorPK = toUint8Array(CryptoJS.enc.Hex.parse(await getPK(contributor)));
 			var shared = sharedKey(mySK, contributorPK);
-			var keyKey = SHA256(bufferToWords(shared)).toString();
-			keys[contributor] = AES.encrypt(EK, keyKey).toString();
+			var keyKey = CryptoJS.SHA256(bufferToWords(shared)).toString();
+			keys[contributor] = CryptoJS.AES.encrypt(EK, keyKey).toString();
 		}
 
 		// Compress content
 		var compressed = bufferToWords(pako.gzip(Buffer.from(content, 'utf8')));
 
 		// Encrypt title and content with EK
-		var encTitle = AES.encrypt(title, EK.toString()).toString();
-		var encContent = AES.encrypt(compressed, EK.toString()).toString();
+		var encTitle = CryptoJS.AES.encrypt(title, EK.toString()).toString();
+		var encContent = CryptoJS.AES.encrypt(compressed, EK.toString()).toString();
 		return { keys: keys, title: encTitle, content: encContent };
 	}
 
 	async function decrypt(note: any) {
-		var mySK = toUint8Array(enc.Hex.parse(get(sk)));
-		var modifierPK = toUint8Array(enc.Hex.parse(await getPK(note.modifiedBy)));
+		var mySK = toUint8Array(CryptoJS.enc.Hex.parse(get(sk)));
+		var modifierPK = toUint8Array(CryptoJS.enc.Hex.parse(await getPK(note.modifiedBy)));
 		var shared = sharedKey(mySK, modifierPK);
-		var key = SHA256(bufferToWords(shared)).toString();
+		var key = CryptoJS.SHA256(bufferToWords(shared)).toString();
 		// Decrypt EK
-		var ek = AES.decrypt(note.keys[get(user)], key).toString();
+		var ek = CryptoJS.AES.decrypt(note.keys[get(user)], key).toString();
 
 		// Decrypt title
-		var title = AES.decrypt(note.title, ek).toString(enc.Utf8);
+		var title = CryptoJS.AES.decrypt(note.title, ek).toString(CryptoJS.enc.Utf8);
 
 		// Decrypt content
-		var content = AES.decrypt(note.content, ek);
+		var content = CryptoJS.AES.decrypt(note.content, ek);
 
 		// Decompress content
 		var decompressed = pako.ungzip(Buffer.from(toUint8Array(content)));

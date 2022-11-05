@@ -1,4 +1,4 @@
-import { lib } from 'crypto-js'
+import CryptoJS from 'crypto-js'
 
 export function toHexString(byteArray: Uint8Array) {
     var s = ""
@@ -26,5 +26,5 @@ export function toUint8Array(wordArray: CryptoJS.lib.WordArray) {
 
 
 export function bufferToWords(buffer: any) {
-    return lib.WordArray.create(buffer);
+    return CryptoJS.lib.WordArray.create(buffer);
 }
