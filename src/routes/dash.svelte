@@ -4,10 +4,10 @@
 	import moment from 'moment-timezone';
 	import pako from 'pako';
 	import DiffMatchPatch from 'diff-match-patch';
+	import CryptoJS from 'crypto-js';
 	import { Buffer } from 'buffer';
 	import { user, session, sk, notes } from './stores';
 	import { get } from 'svelte/store';
-	import CryptoJS from 'crypto-js';
 	import { sharedKey } from '@stablelib/x25519';
 	import { bufferToWords, toHexString, toUint8Array } from '../lib/encoding';
 	import { browser } from '$app/env';
@@ -189,7 +189,8 @@
 
 	onMount(async () => {
 		const module = await import('../lib/ckeditor/ckeditor');
-		const ClassicEditor = module.default;
+		// Workaround: module is undefined on dev environment
+		const ClassicEditor: any = module.default || window.ClassicEditor;
 		ckeditor = await ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
 			autosave: {
 				save(editor: any) {
