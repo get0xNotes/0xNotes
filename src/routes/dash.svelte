@@ -189,9 +189,8 @@
 
 	onMount(async () => {
 		const module = await import('../lib/ckeditor/ckeditor');
-		//console.log(Autosave);
-		//console.log(document.querySelector('#editor'))
-		ckeditor = await window.ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
+		const ClassicEditor = module.default;
+		ckeditor = await ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
 			autosave: {
 				save(editor: any) {
 					return update();
