@@ -2,18 +2,24 @@
 	import NavBar from '../components/NavBar.svelte';
 	import Fa from 'svelte-fa';
 	import moment from 'moment-timezone';
+	import pako from 'pako';
+	import DiffMatchPatch from 'diff-match-patch';
+	import { Buffer } from 'buffer';
 	import { user, session, sk, notes } from './stores';
 	import { get } from 'svelte/store';
 	import { SHA256, AES, enc, lib } from 'crypto-js';
 	import { sharedKey } from '@stablelib/x25519';
-	import { bufferToWords, toHexString, toUint8Array } from '../utils/encoding';
+	import { bufferToWords, toHexString, toUint8Array } from '../lib/encoding';
 	import { browser } from '$app/env';
 	import { faUser, faCalendar } from '@fortawesome/free-solid-svg-icons';
+	import { socket } from '../lib/socket';
+	import { onMount } from 'svelte';
 
 	var search = '';
 	var sortby = 'newest';
-	var currentID: number | undefined; // ID of note currently being edited
-	var editor = { title: '', content: '' };
+	var currentID: number | null | undefined; // ID of note currently being edited
+	var editor = { title: '', content: '', contributors: [] };
+	var ckeditor: any;
 
 	async function getPK(username: string) {
 		var res = await fetch('/api/user/' + username + '/publickey');
@@ -51,23 +57,48 @@
 			}
 			notes.set(data.notes);
 		} else {
-			alert(data.reason);
+			session.set('');
+			window.location.href = '/login';
 		}
 	}
 
 	$: loadNotes();
 
+	socket.on('update', async (modifier, id, data) => {
+		data['modifiedBy'] = modifier;
+
+		// If modified by another socket, update editor
+		if (id != socket.id) {
+			var dec = await decrypt(data);
+			editor.title = dec.title;
+			editor.content = dec.content;
+
+			ckeditor.setData(dec.content);
+		}
+	});
+
+	async function closeNote() {
+		socket.emit('leave', get(sk), currentID);
+		currentID = null;
+		editor = { title: '', content: '', contributors: [] };
+		await loadNotes();
+	}
+
+	// Runs when a change is made to the title or content
+	async function update() {
+		if (editor && currentID && editor.contributors.length != 0) {
+			var content = ckeditor.getData();
+			if (editor.content == content) return;
+			encrypt(editor.title, content, editor.contributors).then((encrypted) => {
+				socket.emit('update', get(sk), currentID, get(user), encrypted);
+			});
+		}
+	}
+
 	async function createNote() {
 		var title = prompt('Create a new note', 'Title') || 'Untitled Note';
-		var content = '';
-		var author = get(user);
-		var authorSK = toUint8Array(enc.Hex.parse(get(sk)));
-		var authorPK = toUint8Array(enc.Hex.parse(await getPK(author)));
-		var selfKey = SHA256(bufferToWords(sharedKey(authorSK, authorPK)));
-		var EK = lib.WordArray.random(256 / 8);
-		var keys = { [author]: AES.encrypt(EK, selfKey.toString()).toString() };
-		var encTitle = AES.encrypt(title, EK.toString()).toString();
-		var encContent = AES.encrypt(content, EK.toString()).toString();
+		var content = "Welcome to 0xNotes' text editor!";
+		var enc = await encrypt(title, content, [get(user)]);
 
 		var res = await fetch('/api/note/create', {
 			method: 'POST',
@@ -76,12 +107,58 @@
 				Authorization: 'Bearer ' + get(session)
 			},
 			body: JSON.stringify({
-				keys: keys,
-				title: encTitle,
-				content: encContent
+				keys: enc.keys,
+				title: enc.title,
+				content: enc.content
 			})
 		});
 		await loadNotes();
+	}
+
+	async function encrypt(title: string, content: string, contributors: string[]) {
+		var me = get(user);
+		var mySK = toUint8Array(enc.Hex.parse(get(sk)));
+
+		// Generate random EK
+		var EK = lib.WordArray.random(256 / 8);
+
+		// for each contributor, generate a shared secret and encrypt EK with it
+		var keys: { [x: string]: string } = {};
+		for (var i = 0; i < contributors.length; i++) {
+			var contributor = contributors[i];
+			var contributorPK = toUint8Array(enc.Hex.parse(await getPK(contributor)));
+			var shared = sharedKey(mySK, contributorPK);
+			var keyKey = SHA256(bufferToWords(shared)).toString();
+			keys[contributor] = AES.encrypt(EK, keyKey).toString();
+		}
+
+		// Compress content
+		var compressed = bufferToWords(pako.gzip(Buffer.from(content, 'utf8')));
+
+		// Encrypt title and content with EK
+		var encTitle = AES.encrypt(title, EK.toString()).toString();
+		var encContent = AES.encrypt(compressed, EK.toString()).toString();
+		return { keys: keys, title: encTitle, content: encContent };
+	}
+
+	async function decrypt(note: any) {
+		var mySK = toUint8Array(enc.Hex.parse(get(sk)));
+		var modifierPK = toUint8Array(enc.Hex.parse(await getPK(note.modifiedBy)));
+		var shared = sharedKey(mySK, modifierPK);
+		var key = SHA256(bufferToWords(shared)).toString();
+		// Decrypt EK
+		var ek = AES.decrypt(note.keys[get(user)], key).toString();
+
+		// Decrypt title
+		var title = AES.decrypt(note.title, ek).toString(enc.Utf8);
+
+		// Decrypt content
+		var content = AES.decrypt(note.content, ek);
+
+		// Decompress content
+		var decompressed = pako.ungzip(Buffer.from(toUint8Array(content)));
+
+		return { title: title, content: new TextDecoder().decode(decompressed) };
 	}
 
 	async function editNote(id: number) {
@@ -96,26 +173,32 @@
 		var data = await res.json();
 		if (data.success) {
 			var note = data.note;
-			var authorSK = toUint8Array(enc.Hex.parse(get(sk)));
-			var modifierPK = toUint8Array(enc.Hex.parse(await getPK(note.modifiedBy)));
-			var shared = sharedKey(authorSK, modifierPK);
-			var key = SHA256(bufferToWords(shared)).toString();
-			// Decrypt EK
-			var ek = AES.decrypt(note.keys[get(user)], key).toString();
-
-			// Decrypt title
-			var title = AES.decrypt(note.title, ek).toString(enc.Utf8);
-
-			// Decrypt content
-			var content = AES.decrypt(note.content, ek).toString(enc.Utf8);
+			var dec = await decrypt(note);
 
 			// Update note editor
-			editor.title = title;
-			editor.content = content;
+			editor.title = dec.title;
+			ckeditor.setData(dec.content);
+			editor.contributors = note.contributors;
+
+			// Request to join room note.id
+			socket.emit('join', get(session), note.id);
 		} else {
 			alert(data.reason);
 		}
 	}
+
+	onMount(async () => {
+		const module = await import('../lib/ckeditor/ckeditor');
+		//console.log(Autosave);
+		//console.log(document.querySelector('#editor'))
+		ckeditor = await window.ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
+			autosave: {
+				save(editor: any) {
+					return update();
+				}
+			}
+		});
+	});
 </script>
 
 <svelte:head>
@@ -163,5 +246,39 @@
 			</div>
 		{/each}
 	</div>
-	<!-- {#if } -->
+	<div
+		class="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-black {currentID
+			? 'block'
+			: 'hidden'}"
+	>
+		<div class=" w-11/12 flex h-screen my-6 mx-auto max-w-3xl">
+			<div
+				class="border-0 my-auto h-auto rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none"
+			>
+				<div class="p-6 flex-auto">
+					<input
+						type="text"
+						class="rounded border border-gray-400 w-full p-2 mb-4"
+						placeholder="Title"
+						bind:value={editor.title}
+						on:keyup={update}
+					/>
+					<textarea
+						class="rounded border border-gray-400 w-full p-2 mb-4"
+						id="editor"
+					/>
+				</div>
+				<div
+					class="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b"
+				>
+					<button
+						class="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+						on:click={closeNote}
+					>
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </main>

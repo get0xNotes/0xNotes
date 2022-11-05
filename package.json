@@ -18,6 +18,8 @@
     "@sveltejs/adapter-node": "^1.0.0-next.77",
     "@sveltejs/kit": "next",
     "@types/crypto-js": "^4.1.1",
+    "@types/diff-match-patch": "^1.0.32",
+    "@types/pako": "^2.0.0",
     "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
@@ -42,9 +44,13 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@stablelib/x25519": "^1.0.3",
+    "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
+    "diff-match-patch": "^1.0.5",
     "jose": "^4.8.3",
     "moment-timezone": "^0.5.38",
+    "pako": "^2.0.4",
+    "socket.io-client": "^4.5.3",
     "svelte-fa": "^3.0.3",
     "svelte-local-storage-store": "^0.3.1",
     "zxcvbn": "^4.4.2"

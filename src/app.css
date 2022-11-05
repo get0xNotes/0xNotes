@@ -50,3 +50,16 @@ html {
 	background-color: #0f2333;
 	background-size: 64px 128px;
 }
+
+.ck-content h2 {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+.ck-content h3 {
+	font-size: 1.25rem;
+	font-weight: bold;
+}
+.ck-content h4 {
+	font-size: 1rem;
+	font-weight: bold;
+}

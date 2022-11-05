@@ -6,7 +6,7 @@
 	import { generateKeyPair } from '@stablelib/x25519'
 	import { user, session, sk } from './stores'
 	import { get } from 'svelte/store';
-	import { bufferToWords, toHexString } from '../utils/encoding'
+	import { bufferToWords, toHexString } from '../lib/encoding'
 	
 	var username = ""
 	var password = ""
