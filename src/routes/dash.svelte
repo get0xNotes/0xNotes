@@ -7,15 +7,15 @@
 	import { Buffer } from 'buffer';
 	import { user, session, sk, notes } from './stores';
 	import { get } from 'svelte/store';
-	import { enc, lib } from 'crypto-js';
-	import SHA256 from 'crypto-js/sha256';
-	import AES from 'crypto-js/aes';
+	import cryptojs from 'crypto-js';
 	import { sharedKey } from '@stablelib/x25519';
 	import { bufferToWords, toHexString, toUint8Array } from '../lib/encoding';
 	import { browser } from '$app/env';
 	import { faUser, faCalendar } from '@fortawesome/free-solid-svg-icons';
 	import { socket } from '../lib/socket';
 	import { onMount } from 'svelte';
+
+	const { lib, enc, SHA256, AES } = cryptojs;
 
 	var search = '';
 	var sortby = 'newest';
