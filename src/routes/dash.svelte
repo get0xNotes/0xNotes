@@ -7,7 +7,9 @@
 	import { Buffer } from 'buffer';
 	import { user, session, sk, notes } from './stores';
 	import { get } from 'svelte/store';
-	import { SHA256, AES, enc, lib } from 'crypto-js';
+	import { enc, lib } from 'crypto-js';
+	import SHA256 from 'crypto-js/sha256';
+	import AES from 'crypto-js/aes';
 	import { sharedKey } from '@stablelib/x25519';
 	import { bufferToWords, toHexString, toUint8Array } from '../lib/encoding';
 	import { browser } from '$app/env';
