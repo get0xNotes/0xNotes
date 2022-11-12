@@ -2,7 +2,7 @@
 ![0xnotes-dash](https://user-images.githubusercontent.com/40331046/201464847-ad18acc1-3074-4e71-b2a4-8b0162cc2764.png)
 
 
-Deployable to Cloudflare Pages and possibly Netlify and Vercel. Requires the workers and the socket.io server to work.
+Deployable to Cloudflare Pages and possibly Netlify and Vercel. Requires the [worker](https://github.com/get0xNotes/workers) and the [Socket.IO](https://github.com/get0xNotes/socket) server to work.
 
 ## License
 
