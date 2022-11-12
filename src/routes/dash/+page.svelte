@@ -285,15 +285,16 @@
 						on:keyup={update}
 					/>
 					<textarea class="rounded border border-gray-400 w-full p-2 mb-4" id="editor" />
-					<Tags
-						class="{editor.author == get(user) ? 'block' : 'hidden'}"
-						tags={editor.contributors.filter((item) => item !== get(user))}
-						on:tags={handleContributors}
-						onlyUnique={true}
-						allowPaste={false}
-						labelText="Collaborators"
-						labelShow
-					/>
+					{#if editor.author == get(user)}
+						<Tags
+							tags={editor.contributors.filter((item) => item !== get(user))}
+							on:tags={handleContributors}
+							onlyUnique={true}
+							allowPaste={false}
+							labelText="Collaborators"
+							labelShow
+						/>
+					{/if}
 				</div>
 				<div
 					class="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b"
