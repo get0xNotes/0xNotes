@@ -219,6 +219,7 @@
 				contributors: contribs
 			})
 		});
+		await update();
 	}
 </script>
 
