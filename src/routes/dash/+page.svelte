@@ -91,7 +91,7 @@
 			var content = ckeditor.getData();
 			if (editor.content == content) return;
 			encrypt(editor.title, content, editor.contributors).then((encrypted) => {
-				socket.emit('update', get(sk), currentID, get(user), encrypted);
+				socket.emit('update', get(session), currentID, get(user), encrypted);
 			});
 		}
 	}
