@@ -2425,6 +2425,11 @@ svelte-preprocess@^4.0.0, svelte-preprocess@^4.10.7:
     sorcery "^0.10.0"
     strip-indent "^3.0.0"
 
+svelte-tags-input@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/svelte-tags-input/-/svelte-tags-input-3.0.0.tgz#c9b99fe1a460fa3dda9444ada54203e1ac823989"
+  integrity sha512-6BvVyzP2aQ1G+twW1H30wKFQDQxQuupBzMXxQ46inPcNbkl3oTSIMqptPqzslH3ytyOepgv6Q6k5wsgj4GNesA==
+
 svelte@^3.44.0:
   version "3.48.0"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.48.0.tgz#f98c866d45e155bad8e1e88f15f9c03cd28753d3"

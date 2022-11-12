@@ -5,6 +5,7 @@
 	import pako from 'pako';
 	import DiffMatchPatch from 'diff-match-patch';
 	import CryptoJS from 'crypto-js';
+	import Tags from 'svelte-tags-input';
 	import { Buffer } from 'buffer';
 	import { user, session, sk, notes } from './stores';
 	import { get } from 'svelte/store';
@@ -112,7 +113,9 @@
 				content: enc.content
 			})
 		});
+		var id = (await res.json()).id;
 		await loadNotes();
+		await editNote(id);
 	}
 
 	async function encrypt(title: string, content: string, contributors: string[]) {
@@ -199,6 +202,23 @@
 			}
 		});
 	});
+
+	async function handleContributors(event: any) {
+		var contribs = event.detail.tags;
+		contribs.push(get(user));
+		contribs = [...new Set(contribs)];
+		editor.contributors = contribs;
+		await fetch('/api/note/' + currentID + '/contributors', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + get(session)
+			},
+			body: JSON.stringify({
+				contributors: contribs
+			})
+		});
+	}
 </script>
 
 <svelte:head>
@@ -263,9 +283,14 @@
 						bind:value={editor.title}
 						on:keyup={update}
 					/>
-					<textarea
-						class="rounded border border-gray-400 w-full p-2 mb-4"
-						id="editor"
+					<textarea class="rounded border border-gray-400 w-full p-2 mb-4" id="editor" />
+					<Tags
+						tags={editor.contributors.filter((item) => item !== get(user))}
+						on:tags={handleContributors}
+						onlyUnique={true}
+						allowPaste={false}
+						labelText="Collaborators"
+						labelShow
 					/>
 				</div>
 				<div

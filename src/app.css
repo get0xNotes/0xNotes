@@ -63,3 +63,8 @@ html {
 	font-size: 1rem;
 	font-weight: bold;
 }
+
+.ck-editor__editable_inline {
+    min-height: 400px;
+	max-height: 400px;
+}
