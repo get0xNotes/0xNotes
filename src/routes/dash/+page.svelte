@@ -19,7 +19,7 @@
 	var search = '';
 	var sortby = 'newest';
 	var currentID: number | null | undefined; // ID of note currently being edited
-	var editor = { title: '', content: '', contributors: [] };
+	var editor = { title: '', content: '', contributors: [], author: '' };
 	var ckeditor: any;
 
 	async function getPK(username: string) {
@@ -81,7 +81,7 @@
 	async function closeNote() {
 		socket.emit('leave', get(sk), currentID);
 		currentID = null;
-		editor = { title: '', content: '', contributors: [] };
+		editor = { title: '', content: '', contributors: [], author: '' };
 		await loadNotes();
 	}
 
@@ -182,6 +182,7 @@
 			editor.title = dec.title;
 			ckeditor.setData(dec.content);
 			editor.contributors = note.contributors;
+			editor.author = note.author;
 
 			// Request to join room note.id
 			socket.emit('join', get(session), note.id);
@@ -285,6 +286,7 @@
 					/>
 					<textarea class="rounded border border-gray-400 w-full p-2 mb-4" id="editor" />
 					<Tags
+						class="{editor.author == get(user) ? 'block' : 'hidden'}"
 						tags={editor.contributors.filter((item) => item !== get(user))}
 						on:tags={handleContributors}
 						onlyUnique={true}
