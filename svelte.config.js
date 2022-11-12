@@ -20,6 +20,7 @@ const config = {
 				'font-src': ['self', 'fonts.gstatic.com'],
 				'connect-src': ['self', 'ws.0xnotes.me', 'wss://ws.0xnotes.me'],
 				'img-src': ['*'],
+				'frame-src': ['*'],
 			}
 		}
 	}
