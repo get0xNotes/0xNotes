@@ -1,8 +1,8 @@
 <script>
-	import NavBar from '../components/NavBar.svelte';
-	import Footer from '../components/Footer.svelte';
+	import NavBar from '../../components/NavBar.svelte';
+	import Footer from '../../components/Footer.svelte';
 	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
-	import { user, session, sk } from './stores'
+	import { user, session, sk } from '../stores'
 	import { get } from 'svelte/store';
 
 	var username = get(user);

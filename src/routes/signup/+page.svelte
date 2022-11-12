@@ -1,12 +1,12 @@
 <script lang="ts">
-	import NavBar from '../components/NavBar.svelte'
-	import Footer from '../components/Footer.svelte'
+	import NavBar from '../../components/NavBar.svelte'
+	import Footer from '../../components/Footer.svelte'
 	import zxcvbn from 'zxcvbn'
 	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
 	import { generateKeyPair } from '@stablelib/x25519'
-	import { user, session, sk } from './stores'
+	import { user, session, sk } from '../stores'
 	import { get } from 'svelte/store';
-	import { bufferToWords, toHexString } from '../lib/encoding'
+	import { bufferToWords, toHexString } from '../../lib/encoding'
 	
 	var username = ""
 	var password = ""

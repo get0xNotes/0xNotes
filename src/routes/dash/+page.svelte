@@ -1,5 +1,5 @@
 <script lang="ts">
-	import NavBar from '../components/NavBar.svelte';
+	import NavBar from '../../components/NavBar.svelte';
 	import Fa from 'svelte-fa';
 	import moment from 'moment-timezone';
 	import pako from 'pako';
@@ -7,13 +7,13 @@
 	import CryptoJS from 'crypto-js';
 	import Tags from 'svelte-tags-input';
 	import { Buffer } from 'buffer';
-	import { user, session, sk, notes } from './stores';
+	import { user, session, sk, notes } from '../stores';
 	import { get } from 'svelte/store';
 	import { sharedKey } from '@stablelib/x25519';
-	import { bufferToWords, toHexString, toUint8Array } from '../lib/encoding';
-	import { browser } from '$app/env';
+	import { bufferToWords, toHexString, toUint8Array } from '../../lib/encoding';
+	import { browser } from '$app/environment';
 	import { faUser, faCalendar } from '@fortawesome/free-solid-svg-icons';
-	import { socket } from '../lib/socket';
+	import { socket } from '../../lib/socket';
 	import { onMount } from 'svelte';
 
 	var search = '';
@@ -191,7 +191,7 @@
 	}
 
 	onMount(async () => {
-		const module = await import('../lib/ckeditor/ckeditor');
+		const module = await import('../../lib/ckeditor/ckeditor');
 		// Workaround: module is undefined on dev environment
 		const ClassicEditor: any = module.default || window.ClassicEditor;
 		ckeditor = await ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
