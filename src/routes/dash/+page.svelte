@@ -59,6 +59,8 @@
 			notes.set(data.notes);
 		} else {
 			session.set('');
+			sk.set('');
+			notes.set('');
 			window.location.href = '/login';
 		}
 	}
@@ -199,6 +201,13 @@
 			autosave: {
 				save(editor: any) {
 					return update();
+				}
+			},
+			simpleUpload: {
+				uploadUrl: '/api/upload',
+				withCredentials: true,
+				headers: {
+					Authorization: 'Bearer ' + get(session)
 				}
 			}
 		});
