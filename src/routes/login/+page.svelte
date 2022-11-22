@@ -51,7 +51,7 @@
 </svelte:head>
 
 <NavBar addClass="sm:absolute" />
-<main class="background h-screen flex">
+<main class="background min-h-screen py-6 flex">
 	<div
 		class="flex flex-col mx-auto my-auto p-6 rounded-md xl:w-3/12 md:w-2/4 w-4/5 bg-primarylight text-white"
 	>

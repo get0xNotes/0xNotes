@@ -237,7 +237,7 @@
 </svelte:head>
 
 <NavBar addClass="" />
-<main class="background h-screen text-white">
+<main class="background min-h-screen text-white">
 	<div class="flex flex-col md:flex-row pb-2 px-3 pt-3 md:px-8 md:pt-8 xl:px-12 xl:pt-12">
 		<input
 			class="flex-1 rounded-md p-2 bg-gray-700 mb-4 md:mb-0 mr-0 md:mr-4"

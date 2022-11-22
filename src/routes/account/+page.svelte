@@ -38,7 +38,7 @@
 </svelte:head>
 
 <NavBar addClass="" />
-<main class="background h-screen text-white p-4 py-4 md:px-6 xl:px-80">
+<main class="background min-h-screen text-white p-4 py-4 md:px-6 xl:px-80">
     <h1 class="font-bold text-4xl">Hello, {get(user)}!</h1>
     <p>For security purposes, do not share any of this information with anyone, including 0xNotes' administrator. If you have a question, read the FAQ first before contacting us.</p>
     <h2 class="font-bold text-3xl my-4">Encryption</h2>
