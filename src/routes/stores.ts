@@ -1,6 +1,6 @@
-import { writable } from 'svelte-local-storage-store'
+import { persisted } from 'svelte-local-storage-store'
 
-export const user = writable('username', "")
-export const session = writable('sessionJWT', "")
-export const sk = writable('secretKey', "")
-export const notes = writable('notes', [])
+export const user = persisted('username', "")
+export const session = persisted('sessionJWT', "")
+export const sk = persisted('secretKey', "")
+export const notes = persisted('notes', [])

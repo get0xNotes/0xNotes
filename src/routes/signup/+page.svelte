@@ -1,54 +1,60 @@
 <script lang="ts">
-	import NavBar from '../../components/NavBar.svelte'
-	import Footer from '../../components/Footer.svelte'
-	import zxcvbn from 'zxcvbn'
-	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
-	import { generateKeyPair } from '@stablelib/x25519'
-	import { user, session, sk } from '../stores'
+	import NavBar from '../../components/NavBar.svelte';
+	import Footer from '../../components/Footer.svelte';
+	import zxcvbn from 'zxcvbn';
+	import { SHA256, PBKDF2, AES, enc } from 'crypto-js';
+	import { generateKeyPair } from '@stablelib/x25519';
+	import { user, session, sk } from '../stores';
 	import { get } from 'svelte/store';
-	import { bufferToWords, toHexString } from '../../lib/encoding'
-	
-	var username = ""
-	var password = ""
-	var confirm = ""
-	var uAvailable = false
-	var uMessage = ""
-	var uColor = ""
-	var allowSubmit = false
+	import { bufferToWords, toHexString } from '../../lib/encoding';
+	import { goto } from '$app/navigation';
+
+	var username = '';
+	var password = '';
+	var confirm = '';
+	var uAvailable = false;
+	var uMessage = '';
+	var uColor = '';
+	var allowSubmit = false;
 
 	$: if (username) {
-		username = username.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase()
+		username = username.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase();
 		if (username.length < 5) {
-			uMessage = "Username must be at least 5 characters long."
-			uColor = "#ef4444"
+			uMessage = 'Username must be at least 5 characters long.';
+			uColor = '#ef4444';
 		} else {
-			fetch('/api/user/' + username + '/available').then(res => res.json()).then(data => {
-				uAvailable = data.available
-				uMessage = data.reason
-				uColor = data.available ? "#10b981" : "#ef4444"
-			})
+			fetch('/api/user/' + username + '/available')
+				.then((res) => res.json())
+				.then((data) => {
+					uAvailable = data.success;
+					uMessage = data.message;
+					uColor = data.success ? '#10b981' : '#ef4444';
+				});
 		}
 	}
 
 	$: if (uAvailable && password == confirm && zxcvbn(password).score == 4) {
-		allowSubmit = true
+		allowSubmit = true;
 	} else {
-		allowSubmit = false
+		allowSubmit = false;
 	}
 
 	$: if (get(user) && get(session) && get(sk)) {
-		window.location.href = "/dash"
+		goto('/dash');
 	}
 
 	async function signup() {
 		if (allowSubmit) {
 			// Clear confirm password
-			confirm = ""
-			
+			confirm = '';
+
 			// Generate master key, auth key, and ECDH keypair
-			var masterKey = PBKDF2(password, username + "0xNotes", { keySize: 256 / 32, iterations: 100000 }).toString()
-			var authKey = enc.Hex.stringify(SHA256(masterKey))
-			var ecdhPair = generateKeyPair()
+			var masterKey = PBKDF2(password, username + '0xNotes', {
+				keySize: 256 / 32,
+				iterations: 100000
+			}).toString();
+			var authKey = enc.Hex.stringify(SHA256(masterKey));
+			var ecdhPair = generateKeyPair();
 
 			// POST to API
 			var res = await fetch('/api/signup', {
@@ -60,20 +66,24 @@
 					username: username,
 					auth: authKey,
 					pk: toHexString(ecdhPair.publicKey),
-					sk: enc.Hex.stringify(enc.Base64.parse(AES.encrypt(bufferToWords(ecdhPair.secretKey), masterKey).toString())),
+					sk: enc.Hex.stringify(
+						enc.Base64.parse(AES.encrypt(bufferToWords(ecdhPair.secretKey), masterKey).toString())
+					)
 				})
-			})
-			var data = await res.json()
+			});
+			var data = await res.json();
 			if (data.success) {
-				user.set(username)
-				session.set(data.session)
-				sk.set(toHexString(ecdhPair.secretKey))
-				window.location.href = "/dash"
+				user.set(username);
+				session.set(data.session);
+				sk.set(toHexString(ecdhPair.secretKey));
+				window.location.href = '/dash';
 			} else {
-				alert("An error occurred while signing up.")
+				alert('An error occurred while signing up.');
 			}
 		} else {
-			alert("Please make sure your username is available, your passwords match, and your password is strong.")
+			alert(
+				'Please make sure your username is available, your passwords match, and your password is strong.'
+			);
 		}
 	}
 </script>
@@ -124,7 +134,11 @@
 			/>
 			<span class="px-1 text-red-500">{password != confirm ? 'Passwords do not match.' : ''}</span>
 		</div>
-		<button class="bg-accent mt-1 mx-1 p-2 rounded-md disabled:bg-sky-800" on:click={signup} disabled={!allowSubmit}>Sign Up</button>
+		<button
+			class="bg-accent mt-1 mx-1 p-2 rounded-md disabled:bg-sky-800"
+			on:click={signup}
+			disabled={!allowSubmit}>Sign Up</button
+		>
 		<div class="mx-auto mt-5">
 			<span>Already registered? </span>
 			<a href="/login" class="underline">Login here.</a>

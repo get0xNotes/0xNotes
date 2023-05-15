@@ -4,13 +4,14 @@
 	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
 	import { user, session, sk } from '../stores'
 	import { get } from 'svelte/store';
+	import { goto } from '$app/navigation';
 
 	var username = get(user);
 	var password = "";
 	var totpcode = "";
 	
 	$: if (get(user) && get(session) && get(sk)) {
-		window.location.href = "/dash"
+		goto("/dash")
 	}
 
 	async function login() {
@@ -39,9 +40,9 @@
 			sk.set(enc.Hex.stringify(secretKey))
 
 			// Redirect to dashboard
-			window.location.href = "/dash"
+			goto("/dash")
 		} else {
-			alert(data.reason)
+			alert(data.message)
 		}
 	}
 </script>

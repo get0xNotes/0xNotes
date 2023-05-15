@@ -26,7 +26,6 @@
 		property="og:description"
 		content="0xNotes is an open-source note-taking app that features end-to-end encryption and user privacy protection."
 	/>
-	<meta property="og:image" content="" />
 
 	<meta property="twitter:card" content="summary_large_image" />
 	<meta property="twitter:url" content="https://0xnotes.me/" />
@@ -34,18 +33,6 @@
 	<meta
 		property="twitter:description"
 		content="0xNotes is an open-source note-taking app that features end-to-end encryption and user privacy protection."
-	/>
-	<meta property="twitter:image" content="" />
-
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="anonymous" />
-	<link
-		rel="preload"
-		as="style"
-		href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap"
-	/>
-	<link
-		rel="stylesheet"
-		href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap"
 	/>
 </svelte:head>
 
@@ -57,7 +44,7 @@
 		</div>
 		<div class="flex flex-col flex-1 my-auto">
 			<h1
-				class="py-4 text-white 2xl:text-8xl xl:text-6xl md:text-5xl text-5xl text-center sm:text-left"
+				class="py-4 text-white font-black 2xl:text-8xl xl:text-6xl md:text-5xl text-5xl text-center sm:text-left"
 			>
 				0xNotes is an <mark>end-to-end encrypted</mark> note-taking app
 			</h1>

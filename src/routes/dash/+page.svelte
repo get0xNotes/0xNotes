@@ -23,7 +23,7 @@
 	var ckeditor: any;
 
 	async function getPK(username: string) {
-		var res = await fetch('/api/user/' + username + '/publickey');
+		var res = await fetch('/api/user/' + username + '/pubkey');
 		var data = await res.json();
 		return data.pk;
 	}
@@ -60,7 +60,7 @@
 		} else {
 			session.set('');
 			sk.set('');
-			notes.set('');
+			notes.set([]);
 			window.location.href = '/login';
 		}
 	}
@@ -282,7 +282,7 @@
 			? 'block'
 			: 'hidden'}"
 	>
-		<div class=" w-11/12 flex h-screen my-6 mx-auto max-w-3xl">
+		<div class=" w-11/12 flex h-screen my-6 mx-auto max-w-4xl">
 			<div
 				class="border-0 my-auto h-auto rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none"
 			>
@@ -320,3 +320,9 @@
 		</div>
 	</div>
 </main>
+
+<style>
+	ul, li {
+		list-style-type: circle;
+	}
+</style>

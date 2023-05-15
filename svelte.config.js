@@ -16,8 +16,8 @@ const config = {
 		csp: {
 			directives: {
 				'default-src': ['self'],
-				'style-src': ['self', 'unsafe-inline', 'fonts.googleapis.com'],
-				'font-src': ['self', 'fonts.gstatic.com'],
+				'style-src': ['self', 'unsafe-inline', 'fonts.bunny.net'],
+				'font-src': ['self', 'fonts.bunny.net'],
 				'connect-src': ['self', 'ws.0xnotes.me', 'wss://ws.0xnotes.me'],
 				'img-src': ['*'],
 				'frame-src': ['*'],
