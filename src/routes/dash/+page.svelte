@@ -320,9 +320,3 @@
 		</div>
 	</div>
 </main>
-
-<style>
-	ul, li {
-		list-style-type: circle;
-	}
-</style>

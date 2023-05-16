@@ -1,7 +1,9 @@
 import { json, error as httpError } from '@sveltejs/kit';
-import { PostgrestClient } from '@supabase/postgrest-js';
 import { createSession, type Creds } from '../common';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
+
+import pkg from '@supabase/postgrest-js';
+const PostgrestClient = pkg.PostgrestClient;
 
 export async function POST({ request }) {
 	const body: Creds = await request.json();

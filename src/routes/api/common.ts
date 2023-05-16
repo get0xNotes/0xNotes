@@ -1,6 +1,8 @@
 import * as jose from 'jose';
-import { PostgrestClient } from '@supabase/postgrest-js';
 import { SERVER_JWK, POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
+
+import pkg from '@supabase/postgrest-js';
+const PostgrestClient = pkg.PostgrestClient;
 
 export type Creds = {
 	username: string;

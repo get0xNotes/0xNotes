@@ -1,7 +1,8 @@
 import { json, error as httpError } from '@sveltejs/kit';
-import { usernameAvailable } from '../../../common';
 import { POSTGREST_KEY, POSTGREST_URL } from '$env/static/private';
-import { PostgrestClient } from '@supabase/postgrest-js';
+
+import pkg from '@supabase/postgrest-js';
+const PostgrestClient = pkg.PostgrestClient;
 
 export async function GET({ params }) {
 	let { username } = params;

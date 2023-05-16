@@ -1,7 +1,9 @@
 import { json, error as httpError } from '@sveltejs/kit';
 import { validateSession } from '../common';
-import { PostgrestClient } from '@supabase/postgrest-js';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
+
+import pkg from '@supabase/postgrest-js';
+const PostgrestClient = pkg.PostgrestClient;
 
 export async function GET({ request }) {
 	const token = request.headers.get('Authorization')?.split(' ')[1];
