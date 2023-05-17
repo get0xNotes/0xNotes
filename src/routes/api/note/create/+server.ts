@@ -1,9 +1,7 @@
 import { json, error as httpError } from '@sveltejs/kit';
 import { validateSession } from '../../common';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
-
-import pkg from '@supabase/postgrest-js';
-const PostgrestClient = pkg.PostgrestClient;
+import { createClient } from '@supabase/supabase-js';
 
 type NewNote = {
 	keys: { [x: string]: string };
@@ -25,9 +23,7 @@ export async function POST({ request }) {
 		throw httpError(401, 'Invalid session');
 	}
 
-	const postgrest = new PostgrestClient(POSTGREST_URL, {
-		headers: { apikey: POSTGREST_KEY, Authorization: `Bearer ${POSTGREST_KEY}` }
-	});
+	const postgrest = createClient(POSTGREST_URL, POSTGREST_KEY);
 
     const { data, error } = await postgrest.from('notes').insert([{author: username, contributors: [username], keys: body.keys, title: body.title, content: body.content, modified: new Date().toISOString(), modifiedBy: username}]).select('id')
     if (error || !data) {

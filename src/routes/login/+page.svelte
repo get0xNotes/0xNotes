@@ -1,26 +1,29 @@
 <script>
 	import NavBar from '../../components/NavBar.svelte';
 	import Footer from '../../components/Footer.svelte';
-	import { SHA256, PBKDF2, AES, enc } from 'crypto-js'
-	import { user, session, sk } from '../stores'
+	import { SHA256, PBKDF2, AES, enc } from 'crypto-js';
+	import { user, session, sk } from '../stores';
 	import { get } from 'svelte/store';
 	import { goto } from '$app/navigation';
 
-	var username = get(user);
-	var password = "";
-	var totpcode = "";
-	
+	let username = get(user);
+	let password = '';
+	let totpcode = '';
+
 	$: if (get(user) && get(session) && get(sk)) {
-		goto("/dash")
+		goto('/dash');
 	}
 
 	async function login() {
-		var masterKey = PBKDF2(password, username + "0xNotes", { keySize: 256 / 32, iterations: 100000 }).toString()
-		var authKey = enc.Hex.stringify(SHA256(masterKey))
+		var masterKey = PBKDF2(password, username + '0xNotes', {
+			keySize: 256 / 32,
+			iterations: 100000
+		}).toString();
+		var authKey = enc.Hex.stringify(SHA256(masterKey));
 
 		// TODO: TOTP and long-term session
 
-		var res =  await fetch('/api/login', {
+		var res = await fetch('/api/login', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -29,20 +32,20 @@
 				username: username,
 				auth: authKey
 			})
-		})
-		var data = await res.json()
+		});
+		var data = await res.json();
 		if (data.success) {
-			session.set(data.session)
-			user.set(data.username)
+			session.set(data.session);
+			user.set(data.username);
 
 			// Decrypt SK
-			var secretKey = AES.decrypt(enc.Base64.stringify(enc.Hex.parse(data.sk)), masterKey)
-			sk.set(enc.Hex.stringify(secretKey))
+			var secretKey = AES.decrypt(enc.Base64.stringify(enc.Hex.parse(data.sk)), masterKey);
+			sk.set(enc.Hex.stringify(secretKey));
 
 			// Redirect to dashboard
-			goto("/dash")
+			goto('/dash');
 		} else {
-			alert(data.message)
+			alert(data.message);
 		}
 	}
 </script>
@@ -87,7 +90,7 @@
 				<label for="longsession" class="ml-1">Keep me logged in for a week!</label>
 			</div>
 		</div>
-		<button class="bg-accent mt-1 mx-1 p-2 rounded-md" on:click={login}>Login</button>
+		<button class="bg-accent mt-1 mx-1 p-2 rounded-md hover:scale-105" on:click={login}>Login</button>
 		<div class="mx-auto mt-5">
 			<span>New user? </span>
 			<a href="/signup" class="underline">Create an account.</a>

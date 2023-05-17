@@ -1,8 +1,6 @@
 import * as jose from 'jose';
 import { SERVER_JWK, POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
-
-import pkg from '@supabase/postgrest-js';
-const PostgrestClient = pkg.PostgrestClient;
+import { createClient } from '@supabase/supabase-js';
 
 export type Creds = {
 	username: string;
@@ -34,9 +32,7 @@ export async function validateSession(token: string) {
   }
 
 export async function usernameAvailable(username: string) {
-	const postgrest = new PostgrestClient(POSTGREST_URL, {
-		headers: { apikey: POSTGREST_KEY, Authorization: `Bearer ${POSTGREST_KEY}` }
-	});
+	const postgrest = createClient(POSTGREST_URL, POSTGREST_KEY);
 	const { data, error } = await postgrest
 		.from('users')
 		.select('username')

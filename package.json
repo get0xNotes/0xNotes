@@ -42,7 +42,7 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@stablelib/x25519": "^1.0.3",
-    "@supabase/postgrest-js": "^1.6.1",
+    "@supabase/supabase-js": "^2.22.0",
     "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
     "diff-match-patch": "^1.0.5",

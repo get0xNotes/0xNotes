@@ -1,9 +1,7 @@
 import { json, error as httpError } from '@sveltejs/kit';
 import { createSession, usernameAvailable, type Creds } from '../common';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
-
-import pkg from '@supabase/postgrest-js';
-const PostgrestClient = pkg.PostgrestClient;
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST({ request }) {
 	const body: Creds = await request.json();
@@ -37,9 +35,7 @@ export async function POST({ request }) {
 		throw httpError(400, 'Invalid sk');
 	}
 
-	const postgrest = new PostgrestClient(POSTGREST_URL, {
-		headers: { apikey: POSTGREST_KEY, Authorization: `Bearer ${POSTGREST_KEY}` }
-	});
+	const postgrest = createClient(POSTGREST_URL, POSTGREST_KEY);
 	const { data, error } = await postgrest.from('users').insert([{ username, auth, pk, sk }]);
 	if (error) {
 		throw httpError(500, 'Database error');

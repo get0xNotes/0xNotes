@@ -135,7 +135,7 @@
 			<span class="px-1 text-red-500">{password != confirm ? 'Passwords do not match.' : ''}</span>
 		</div>
 		<button
-			class="bg-accent mt-1 mx-1 p-2 rounded-md disabled:bg-sky-800"
+			class="bg-accent mt-1 mx-1 p-2 rounded-md disabled:bg-sky-800 hover:scale-105"
 			on:click={signup}
 			disabled={!allowSubmit}>Sign Up</button
 		>

@@ -1,9 +1,7 @@
 import { json, error as httpError } from '@sveltejs/kit';
 import { validateSession } from '../common';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
-
-import pkg from '@supabase/postgrest-js';
-const PostgrestClient = pkg.PostgrestClient;
+import { createClient } from '@supabase/supabase-js';
 
 export async function GET({ request }) {
 	const token = request.headers.get('Authorization')?.split(' ')[1];
@@ -18,9 +16,7 @@ export async function GET({ request }) {
 		throw httpError(401, 'Invalid session');
 	}
 
-	const postgrest = new PostgrestClient(POSTGREST_URL, {
-		headers: { apikey: POSTGREST_KEY, Authorization: `Bearer ${POSTGREST_KEY}` }
-	});
+	const postgrest = createClient(POSTGREST_URL, POSTGREST_KEY);
 
     // Select where username is in the contributor column
     let { data, error } = await postgrest.from('notes').select('id, title, author, keys, modified, modifiedBy').contains('contributors', [username])
