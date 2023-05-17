@@ -500,8 +500,10 @@ chokidar@^3.5.2:
   optionalDependencies:
     fsevents "~2.3.2"
 
-"ckeditor5-custom-build@file:ckeditor5":
-  version "0.0.1"
+ckeditor5-custom-build@0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/ckeditor5-custom-build/-/ckeditor5-custom-build-0.0.6.tgz#b5eb3748381101417a9fb1328db6a3fcb28bee7d"
+  integrity sha512-CEFTaipvr8bv+xHexbziIImYRy2w3dx/hcvnc7iAVzUe2ZmOzUyZQ+ecYWaJJLCcehWXqZVgaWAaxcXl1+EO2A==
 
 color-convert@^1.9.0:
   version "1.9.3"
