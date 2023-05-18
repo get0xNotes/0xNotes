@@ -199,6 +199,7 @@
 		const ClassicEditor: any = module.default || window.ClassicEditor;
 		ckeditor = await ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
 			autosave: {
+				waitingTime: 300,
 				save(editor: any) {
 					return update();
 				}
