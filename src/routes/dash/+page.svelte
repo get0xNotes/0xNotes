@@ -81,7 +81,8 @@
 	});
 
 	async function closeNote() {
-		socket.emit('leave', get(sk), currentID);
+		await update();
+		socket.emit('leave', get(session), currentID);
 		currentID = null;
 		editor = { title: '', content: '', contributors: [], author: '' };
 		await loadNotes();
@@ -92,9 +93,8 @@
 		if (editor && currentID && editor.contributors.length != 0) {
 			var content = ckeditor.getData();
 			if (editor.content == content) return;
-			encrypt(editor.title, content, editor.contributors).then((encrypted) => {
-				socket.emit('update', get(session), currentID, get(user), encrypted);
-			});
+			let encrypted = await encrypt(editor.title, content, editor.contributors)
+			socket.emit('update', get(session), currentID, get(user), encrypted);
 		}
 	}
 
@@ -281,7 +281,7 @@
 				on:click={() => editNote(note['id'])}
 			>
 				<div class="h-full break-words bg-gray-600 rounded-md p-3">
-					<h3 class="text-lg">{note['title']}</h3>
+					<h3 class="text-lg line-clamp-3">{note['title']}</h3>
 					<div class="flex">
 						<Fa icon={faUser} class="my-auto" /><span class="my-auto ml-1 font-thin"
 							>{note['author']}</span
