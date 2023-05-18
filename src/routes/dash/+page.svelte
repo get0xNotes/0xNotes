@@ -230,6 +230,25 @@
 		});
 		await update();
 	}
+
+	async function sort(event: any) {
+		if (search != '') {
+			$notes = $notes.filter((note) => note.title.toLowerCase().includes(search.toLowerCase()));
+		}
+		if (sortby == 'newest') {
+			$notes = $notes.sort((a, b) => {
+				return new Date(b.modified).getTime() - new Date(a.modified).getTime();
+			});
+		} else if (sortby == 'oldest') {
+			$notes = $notes.sort((a, b) => {
+				return new Date(a.modified).getTime() - new Date(b.modified).getTime();
+			});
+		} else if (sortby == 'alphabetical') {
+			$notes = $notes.sort((a, b) => {
+				return a.title.localeCompare(b.title);
+			});
+		}
+	}
 </script>
 
 <svelte:head>
@@ -245,7 +264,7 @@
 			bind:value={search}
 		/>
 		<div class="flex-1 flex flex-row">
-			<select id="sort" class="flex-1 bg-gray-700 p-2 rounded-md mr-2" bind:value={sortby}>
+			<select id="sort" class="flex-1 bg-gray-700 p-2 rounded-md mr-2" bind:value={sortby} on:change={sort}>
 				<option value="newest">Newest</option>
 				<option value="oldest">Oldest</option>
 				<option value="alphabetical">Alphabetical</option>
