@@ -16,15 +16,18 @@
 	import { socket } from '../../lib/socket';
 	import { onMount } from 'svelte';
 
-	var search = '';
-	var sortby = 'newest';
-	var currentID: number | null | undefined; // ID of note currently being edited
-	var editor = { title: '', content: '', contributors: [], author: '' };
-	var ckeditor: any;
+	let search = '';
+	let sortby = 'newest';
+	let currentID: number | null | undefined; // ID of note currently being edited
+	let editor = { title: '', content: '', contributors: [], author: '' };
+	let ckeditor: any;
+	let pubkey: any = {};
 
 	async function getPK(username: string) {
-		var res = await fetch('/api/user/' + username + '/pubkey');
-		var data = await res.json();
+		if (pubkey[username]) return pubkey[username];
+		let res = await fetch('/api/user/' + username + '/pubkey');
+		let data = await res.json();
+		pubkey[username] = data.pk;
 		return data.pk;
 	}
 
