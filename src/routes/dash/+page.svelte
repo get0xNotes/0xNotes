@@ -213,6 +213,11 @@
 				headers: {
 					Authorization: 'Bearer ' + get(session)
 				}
+			},
+			ui: {
+				poweredBy: {
+					label: '0xNotes powered by'
+				}
 			}
 		});
 	});
