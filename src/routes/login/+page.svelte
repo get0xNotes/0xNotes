@@ -10,10 +10,6 @@
 	let password = '';
 	let totpcode = '';
 
-	$: if (get(user) && get(session) && get(sk)) {
-		goto('/dash');
-	}
-
 	async function login() {
 		var masterKey = PBKDF2(password, username + '0xNotes', {
 			keySize: 256 / 32,

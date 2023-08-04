@@ -1,5 +1,5 @@
 import { json, error as httpError } from '@sveltejs/kit';
-import { usernameAvailable } from '../../../common';
+import { usernameAvailable } from '$lib/server/common';
 
 export async function GET({ params }) {
 	let { username } = params;

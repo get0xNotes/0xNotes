@@ -1,5 +1,5 @@
 import { json, error as httpError } from '@sveltejs/kit';
-import { createSession, usernameAvailable, type Creds } from '../common';
+import { createSession, usernameAvailable, type Creds } from '$lib/server/common';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js';
 

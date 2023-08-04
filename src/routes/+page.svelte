@@ -1,14 +1,8 @@
 <script>
-	import { browser } from '$app/environment';
 	import NavBar from '../components/NavBar.svelte';
 	import Footer from '../components/Footer.svelte';
 
-	var isLoggedIn = false;
-	if (browser) {
-		if (localStorage.getItem('SESSION_TOKEN')) {
-			isLoggedIn = true;
-		}
-	}
+	export let data;
 </script>
 
 <svelte:head>
@@ -36,7 +30,7 @@
 	/>
 </svelte:head>
 
-<NavBar />
+<NavBar isLoggedIn={data.isLoggedIn} />
 <main class="background min-h-screen flex xl:px-14 md:px-10 px-4 pb-5">
 	<div class="my-auto flex sm:flex-row-reverse flex-col-reverse">
 		<div class="flex flex-1">
@@ -54,13 +48,13 @@
 				<b>user privacy protection</b>, and it's completely <b>open-source</b>!
 			</p>
 			<div class="flex flex-row mx-auto sm:mx-0">
-				<a style="display: {isLoggedIn ? 'none' : 'block'}" href="/login">
+				<a style="display: {data.isLoggedIn ? 'none' : 'block'}" href="/login">
 					<button class="bg-accent text-white my-auto mx-1 p-2 px-6 rounded-md">Login</button>
 				</a>
-				<a style="display: {isLoggedIn ? 'none' : 'block'}" href="/signup">
+				<a style="display: {data.isLoggedIn ? 'none' : 'block'}" href="/signup">
 					<button class="bg-accent text-white my-auto mx-1 p-2 px-6 rounded-md">Sign Up</button>
 				</a>
-				<a style="display: {isLoggedIn ? 'block' : 'none'}" href="/dash">
+				<a style="display: {data.isLoggedIn ? 'block' : 'none'}" href="/dash">
 					<button class="bg-accent text-white my-auto mx-1 p-2 px-6 rounded-md"
 						>Go To Dashboard</button
 					>

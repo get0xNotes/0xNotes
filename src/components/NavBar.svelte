@@ -1,13 +1,6 @@
 <script lang="ts">
-	import { user, session, sk } from '../routes/stores';
-	import { get } from 'svelte/store';
-
 	export var addClass: String = "";
-
-	var isLoggedIn = false
-	$: if (get(user) && get(session) && get(sk)) {
-		isLoggedIn = true
-	}
+	export var isLoggedIn: Boolean = false
 </script>
 
 <header class="{addClass} flex p-3 px-6 w-full text-white bg-primarylight">

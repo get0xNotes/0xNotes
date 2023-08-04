@@ -30,7 +30,7 @@
 		session.set('');
 		sk.set('');
 		notes.set([]);
-		window.location.href = '/login';
+		window.location.href = '/logout';
 	}
 </script>
 
@@ -38,7 +38,7 @@
 	<title>Dashboard | 0xNotes</title>
 </svelte:head>
 
-<NavBar addClass="" />
+<NavBar isLoggedIn={true} />
 <main class="background min-h-screen text-white p-4 py-4 md:px-6">
 	<div class="max-w-6xl mx-auto">
 		<h1 class="font-bold text-4xl my-4">Hello, {get(user)}!</h1>

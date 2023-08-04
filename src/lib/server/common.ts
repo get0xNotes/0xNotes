@@ -10,7 +10,7 @@ export type Creds = {
 	totp?: string;
 };
 
-export async function createSession(aud: string, iss: string = '0xNotes', exp: string = '1d') {
+export async function createSession(aud: string, iss: string = '0xNotes', exp: string = '7d') {
 	return await new jose.SignJWT({ claim: true })
 		.setProtectedHeader({ alg: 'EdDSA' })
 		.setIssuedAt()

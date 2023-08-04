@@ -1,9 +1,9 @@
 import { json, error as httpError } from '@sveltejs/kit';
-import { createSession, type Creds } from '../common';
+import { createSession, type Creds } from '$lib/server/common';
 import { POSTGREST_URL, POSTGREST_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js';
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
 	const body: Creds = await request.json();
 
 	if (!body.username || !body.auth) {
@@ -28,5 +28,12 @@ export async function POST({ request }) {
 	}
 
 	const session = await createSession(username);
+	cookies.set('session', session, {
+		path: '/',
+		maxAge: 60 * 60 * 24 * 7,
+		sameSite: 'lax',
+		secure: true,
+		httpOnly: true,
+	});
 	return json({ success: true, username, session, sk: data[0].sk });
 }
