@@ -26,7 +26,7 @@ export async function POST({ request }) {
 	}
 
 	if (!(img instanceof File)) {
-		return json({ success: false, error: img }, { status: 400 });
+		throw httpError(400, 'Invalid file');
 	}
 
 	if (!img.type.startsWith('image/')) {
