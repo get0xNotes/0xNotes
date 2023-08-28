@@ -2499,10 +2499,10 @@ svelte-preprocess@^5.0.4:
     sorcery "^0.11.0"
     strip-indent "^3.0.0"
 
-svelte-tags-input@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/svelte-tags-input/-/svelte-tags-input-5.0.0.tgz#921a9d65759e32c247b7bde27903410c0c9b2523"
-  integrity sha512-lH0rkSdVcurCEnJBkHG9gTQfpz0gsQmVBzA+TQqSLL1/A0okRsz8lZJzVC20d6Eufkr24b5zHkYzQmrbIaqS/w==
+svelte-tags-input@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/svelte-tags-input/-/svelte-tags-input-3.0.0.tgz#c9b99fe1a460fa3dda9444ada54203e1ac823989"
+  integrity sha512-6BvVyzP2aQ1G+twW1H30wKFQDQxQuupBzMXxQ46inPcNbkl3oTSIMqptPqzslH3ytyOepgv6Q6k5wsgj4GNesA==
 
 svelte@^4.1.2:
   version "4.1.2"

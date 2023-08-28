@@ -53,7 +53,7 @@
     "socket.io-client": "^4.7.2",
     "svelte-fa": "^3.0.4",
     "svelte-local-storage-store": "^0.5.0",
-    "svelte-tags-input": "^5.0.0",
+    "svelte-tags-input": "^3.0.0",
     "zxcvbn": "^4.4.2"
   }
 }
