@@ -21,9 +21,9 @@ export async function GET({ request, params }) {
 
 	const { data, error } = await postgrest
 		.from('notes')
-		.select('id, title, author, contributors, keys, content, modified, modifiedBy')
+		.select('id, title, author, collaborators, keys, content, modified, modifiedBy')
 		.eq('id', id)
-		.contains('contributors', [username]);
+		.contains('collaborators', [username]);
 	if (error) {
 		console.log(error);
 		throw httpError(500, 'Database error');

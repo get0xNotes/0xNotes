@@ -19,7 +19,7 @@ export async function GET({ request }) {
 	const postgrest = createClient(POSTGREST_URL, POSTGREST_KEY);
 
     // Select where username is in the contributor column
-    let { data, error } = await postgrest.from('notes').select('id, title, author, keys, modified, modifiedBy').contains('contributors', [username])
+    let { data, error } = await postgrest.from('notes').select('id, title, author, keys, modified, modifiedBy').contains('collaborators', [username])
 
     if (error) {
         console.log(error)

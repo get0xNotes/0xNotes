@@ -19,7 +19,7 @@
 	let search = '';
 	let sortby = 'newest';
 	let currentID: number | null | undefined; // ID of note currently being edited
-	let editor = { title: '', content: '', contributors: [], author: '' };
+	let editor = { title: '', content: '', collaborators: [], author: '' };
 	let ckeditor: any;
 	let pubkey: any = {};
 
@@ -87,16 +87,16 @@
 		await update();
 		socket.emit('leave', get(session), currentID);
 		currentID = null;
-		editor = { title: '', content: '', contributors: [], author: '' };
+		editor = { title: '', content: '', collaborators: [], author: '' };
 		await loadNotes();
 	}
 
 	// Runs when a change is made to the title or content
 	async function update() {
-		if (editor && currentID && editor.contributors.length != 0) {
+		if (editor && currentID && editor.collaborators.length != 0) {
 			var content = ckeditor.getData();
 			if (editor.content == content) return;
-			let encrypted = await encrypt(editor.title, content, editor.contributors)
+			let encrypted = await encrypt(editor.title, content, editor.collaborators)
 			socket.emit('update', get(session), currentID, get(user), encrypted);
 		}
 	}
@@ -123,7 +123,7 @@
 		await editNote(id);
 	}
 
-	async function encrypt(title: string, content: string, contributors: string[]) {
+	async function encrypt(title: string, content: string, collaborators: string[]) {
 		var me = get(user);
 		var mySK = toUint8Array(CryptoJS.enc.Hex.parse(get(sk)));
 
@@ -132,8 +132,8 @@
 
 		// for each contributor, generate a shared secret and encrypt EK with it
 		var keys: { [x: string]: string } = {};
-		for (var i = 0; i < contributors.length; i++) {
-			var contributor = contributors[i];
+		for (var i = 0; i < collaborators.length; i++) {
+			var contributor = collaborators[i];
 			var contributorPK = toUint8Array(CryptoJS.enc.Hex.parse(await getPK(contributor)));
 			var shared = sharedKey(mySK, contributorPK);
 			var keyKey = CryptoJS.SHA256(bufferToWords(shared)).toString();
@@ -186,7 +186,7 @@
 			// Update note editor
 			editor.title = dec.title;
 			ckeditor.setData(dec.content);
-			editor.contributors = note.contributors;
+			editor.collaborators = note.collaborators;
 			editor.author = note.author;
 
 			// Request to join room note.id
@@ -202,7 +202,7 @@
 		const ClassicEditor: any = module.default || window.ClassicEditor;
 		ckeditor = await ClassicEditor.create(document.querySelector('#editor') as HTMLElement, {
 			autosave: {
-				waitingTime: 300,
+				waitingTime: 10,
 				save(editor: any) {
 					return update();
 				}
@@ -222,19 +222,19 @@
 		});
 	});
 
-	async function handleContributors(event: any) {
-		var contribs = event.detail.tags;
-		contribs.push(get(user));
-		contribs = [...new Set(contribs)];
-		editor.contributors = contribs;
-		await fetch('/api/note/' + currentID + '/contributors', {
+	async function onCollaboratorChange(event: any) {
+		var collaborators = event.detail.tags;
+		collaborators.push(get(user));
+		collaborators = [...new Set(collaborators)];
+		editor.collaborators = collaborators;
+		await fetch('/api/note/' + currentID + '/collaborators', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: 'Bearer ' + get(session)
 			},
 			body: JSON.stringify({
-				contributors: contribs
+				collaborators
 			})
 		});
 		await update();
@@ -325,8 +325,8 @@
 					<textarea class="rounded border border-gray-400 w-full p-2 mb-4" id="editor" />
 					{#if editor.author == get(user)}
 						<Tags
-							tags={editor.contributors.filter((item) => item !== get(user))}
-							on:tags={handleContributors}
+							tags={editor.collaborators.filter((item) => item !== get(user))}
+							on:tags={onCollaboratorChange}
 							onlyUnique={true}
 							allowPaste={false}
 							labelText="Collaborators"

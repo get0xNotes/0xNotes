@@ -25,7 +25,7 @@ export async function POST({ request }) {
 
 	const postgrest = createClient(POSTGREST_URL, POSTGREST_KEY);
 
-    const { data, error } = await postgrest.from('notes').insert([{author: username, contributors: [username], keys: body.keys, title: body.title, content: body.content, modified: new Date().toISOString(), modifiedBy: username}]).select('id')
+    const { data, error } = await postgrest.from('notes').insert([{author: username, collaborators: [username], keys: body.keys, title: body.title, content: body.content, modified: new Date().toISOString(), modifiedBy: username}]).select('id')
     if (error || !data) {
         console.log(error)
         throw httpError(500, 'Database error');
