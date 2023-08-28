@@ -25,6 +25,10 @@ export async function POST({ request }) {
 		throw httpError(401, 'Invalid session');
 	}
 
+	if (!(img instanceof File)) {
+		return json({ success: false, error: img }, { status: 400 });
+	}
+
 	if (!img.type.startsWith('image/')) {
 		throw httpError(400, 'Invalid file type');
 	}
