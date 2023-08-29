@@ -16,21 +16,27 @@
 	var uMessage = '';
 	var uColor = '';
 	var allowSubmit = false;
+	let timer: NodeJS.Timeout;
 
-	$: if (username) {
-		username = username.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase();
-		if (username.length < 5) {
-			uMessage = 'Username must be at least 5 characters long.';
-			uColor = '#ef4444';
-		} else {
-			fetch('/api/user/' + username + '/available')
-				.then((res) => res.json())
-				.then((data) => {
-					uAvailable = data.success;
-					uMessage = data.message;
-					uColor = data.success ? '#10b981' : '#ef4444';
-				});
-		}
+	$: {
+		uMessage = "loading..."
+		uColor = 'darkgray'
+		timer && clearTimeout(timer)
+		timer = setTimeout(() => {
+			username = username.replace(/[^0-9a-zA-Z_\-.]/g, '').toLowerCase();
+			if (username.length < 5) {
+				uMessage = 'Username must be at least 5 characters long.';
+				uColor = '#ef4444';
+			} else {
+				fetch('/api/user/' + username + '/available')
+					.then((res) => res.json())
+					.then((data) => {
+						uAvailable = data.success;
+						uMessage = data.message;
+						uColor = data.success ? '#10b981' : '#ef4444';
+					});
+			}
+		}, 250)
 	}
 
 	$: if (uAvailable && password == confirm && zxcvbn(password).score == 4) {
